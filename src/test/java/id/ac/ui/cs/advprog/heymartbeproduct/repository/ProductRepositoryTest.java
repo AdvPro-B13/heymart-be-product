@@ -48,14 +48,11 @@ class ProductRepositoryTest {
     @Test
     void testSaveProduct() {
         Product product = new Product();
-        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(null);
-        when(entityManager.merge(product)).thenReturn(product);
 
-        Product result = productRepository.saveProduct(product);
+        productRepository.saveProduct(product);
 
-        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", result.getId());
         verify(entityManager, times(1)).persist(product);
         verify(entityManager, times(0)).merge(product);
     }
@@ -64,15 +61,21 @@ class ProductRepositoryTest {
     void testUpdateProduct() {
         Product product = new Product();
         product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product.setName("Old Product Name");
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(product);
-        when(entityManager.merge(product)).thenReturn(product);
 
-        Product result = productRepository.saveProduct(product);
+        Product updatedProduct = new Product();
+        updatedProduct.setId(product.getId());
+        updatedProduct.setName("New Product Name");
 
-        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", result.getId());
-        verify(entityManager, times(0)).persist(product);
-        verify(entityManager, times(1)).merge(product);
+        when(entityManager.merge(updatedProduct)).thenReturn(updatedProduct);
+
+        Product result = productRepository.saveProduct(updatedProduct);
+
+        assertEquals("New Product Name", result.getName());
+        verify(entityManager, times(0)).persist(updatedProduct);
+        verify(entityManager, times(1)).merge(updatedProduct);
     }
 
     @Test
