@@ -17,22 +17,43 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product create(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        if (productRepository.findProductById(product.getId()).isPresent()) {
+            throw new IllegalArgumentException("Product with this ID already exists");
+        }
         return productRepository.saveProduct(product);
     }
 
     @Override
     public Product findById(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
         return productRepository.findProductById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
     }
 
     @Override
     public Product edit(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        if (!productRepository.findProductById(product.getId()).isPresent()) {
+            throw new IllegalArgumentException("Product not found");
+        }
         return productRepository.saveProduct(product);
     }
 
     @Override
     public void deleteById(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
+        if (!productRepository.findProductById(id).isPresent()) {
+            throw new IllegalArgumentException("Product not found");
+        }
         productRepository.deleteProductById(id);
     }
 

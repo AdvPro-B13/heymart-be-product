@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ProductServiceImplTest {
@@ -31,12 +31,26 @@ class ProductServiceImplTest {
     @Test
     void testCreateProduct() {
         Product product = new Product();
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.empty());
         when(productRepository.saveProduct(product)).thenReturn(product);
 
         Product createdProduct = productService.create(product);
 
         assertEquals(product, createdProduct);
         verify(productRepository, times(1)).saveProduct(product);
+    }
+
+    @Test
+    void testCreateProductWithExistingId() {
+        Product product = new Product();
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
+
+        assertThrows(IllegalArgumentException.class, () -> productService.create(product));
+    }
+
+    @Test
+    void testCreateProductWithNull() {
+        assertThrows(IllegalArgumentException.class, () -> productService.create(null));
     }
 
     @Test
@@ -52,8 +66,28 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void testFindProductByIdNotFound() {
+        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> productService.findById("eb558e9f-1c39-460e-8860-71af6af63bd6"));
+    }
+
+    @Test
+    void testFindProductByIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> productService.findById(null));
+    }
+
+    @Test
+    void testFindProductByIdEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> productService.findById(""));
+    }
+
+    @Test
     void testEditProduct() {
         Product product = new Product();
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
         when(productRepository.saveProduct(product)).thenReturn(product);
 
         Product editedProduct = productService.edit(product);
@@ -63,12 +97,45 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void testEditProductNotFound() {
+        Product product = new Product();
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> productService.edit(product));
+    }
+
+    @Test
+    void testEditProductNull() {
+        assertThrows(IllegalArgumentException.class, () -> productService.edit(null));
+    }
+
+    @Test
     void testDeleteProductById() {
+        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6"))
+                .thenReturn(Optional.of(new Product()));
         doNothing().when(productRepository).deleteProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
         productService.deleteById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
         verify(productRepository, times(1)).deleteProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+    }
+
+    @Test
+    void testDeleteProductByIdNotFound() {
+        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> productService.deleteById("eb558e9f-1c39-460e-8860-71af6af63bd6"));
+    }
+
+    @Test
+    void testDeleteProductByIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteById(null));
+    }
+
+    @Test
+    void testDeleteProductByIdEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteById(""));
     }
 
     @Test
