@@ -31,6 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+	implementation("jakarta.transaction:jakarta.transaction-api:2.0.1")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
