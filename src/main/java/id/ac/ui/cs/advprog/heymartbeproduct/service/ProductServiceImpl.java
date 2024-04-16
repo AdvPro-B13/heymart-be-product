@@ -17,30 +17,27 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product create(Product product) {
-        // Implementations will be added here
-        return null;
+        return productRepository.saveProduct(product);
     }
 
     @Override
     public Product findById(String id) {
-        // Implementations will be added here
-        return null;
+        return productRepository.findProductById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
     }
 
     @Override
     public Product edit(Product product) {
-        // Implementations will be added here
-        return null;
+        return productRepository.saveProduct(product);
     }
 
     @Override
     public void deleteById(String id) {
-        // Implementations will be added here
+        productRepository.deleteProductById(id);
     }
 
     @Override
     public List<Product> getAllProducts() {
-        // Implementations will be added here
-        return null;
+        return productRepository.getAllProducts();
     }
 }

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class ProductServiceImplTest {
@@ -22,7 +21,7 @@ class ProductServiceImplTest {
     private ProductRepository productRepository;
 
     @InjectMocks
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +42,8 @@ class ProductServiceImplTest {
     @Test
     void testFindProductById() {
         Product product = new Product();
-        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.of(product));
+        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6"))
+                .thenReturn(Optional.of(product));
 
         Product foundProduct = productService.findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
