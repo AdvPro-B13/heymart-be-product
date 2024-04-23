@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -111,5 +113,55 @@ public class CategoryRepositoryTest {
 
         verify(entityManager, times(1)).merge(category3);
         assert (!category3.getProducts().contains(product));
+    }
+
+    @Test
+    public void testFindCategoryByNameNotFound() {
+        when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
+
+        Optional<Category> result = categoryRepository.findCategoryByName("NonExistent");
+
+        verify(entityManager, times(1)).find(Category.class, "NonExistent");
+        assert (!result.isPresent());
+    }
+
+    @Test
+    public void testSaveCategoryAlreadyExists() {
+        when(entityManager.find(Category.class, "Electronics")).thenReturn(category);
+        when(entityManager.merge(category)).thenReturn(category);
+
+        Category result = categoryRepository.saveCategory(category);
+
+        verify(entityManager, times(1)).merge(category);
+        assertEquals("Electronics", result.getName());
+    }
+
+    @Test
+    public void testDeleteCategoryByNameNotFound() {
+        when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            categoryRepository.deleteCategoryByName("NonExistent");
+        });
+    }
+
+    @Test
+    public void testAddProductToCategoryNotFound() {
+        when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
+        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            categoryRepository.addProductToCategory("NonExistent", product);
+        });
+    }
+
+    @Test
+    public void testRemoveProductFromCategoryNotFound() {
+        when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
+        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            categoryRepository.removeProductFromCategory("NonExistent", product);
+        });
     }
 }
