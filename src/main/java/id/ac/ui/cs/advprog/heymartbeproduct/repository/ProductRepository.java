@@ -7,22 +7,12 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class ProductRepository {
     @PersistenceContext
     private EntityManager entityManager;
-
-    private static ProductRepository instance;
-
-    private ProductRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
-
-    public static ProductRepository getInstance(EntityManager entityManager) {
-        if (instance == null) {
-            instance = new ProductRepository(entityManager);
-        }
-        return instance;
-    }
 
     @Transactional
     public Optional<Product> findProductById(String id) {
