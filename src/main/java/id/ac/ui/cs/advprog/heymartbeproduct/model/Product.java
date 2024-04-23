@@ -25,17 +25,14 @@ public class Product {
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "name"))
     private Set<Category> categories;
 
-    public Product(String name, double price, String description, int quantity, String image) {
+    private Product(ProductBuilder builder) {
         this.id = UUID.randomUUID().toString();
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.quantity = quantity;
-        this.image = image;
-    }
-
-    public Product() {
-        this.id = UUID.randomUUID().toString();
+        this.name = builder.name;
+        this.price = builder.price;
+        this.description = builder.description;
+        this.quantity = builder.quantity;
+        this.image = builder.image;
+        this.categories = builder.categories != null ? new HashSet<>(builder.categories) : new HashSet<>();
     }
 
     public void setPrice(double price) {
@@ -71,5 +68,48 @@ public class Product {
             categories.remove(category);
         }
         category.getProducts().remove(this);
+    }
+
+    public static class ProductBuilder {
+        // Required parameters
+        private String name;
+        private double price;
+        private int quantity;
+
+        // Optional parameters
+        private String description;
+        private String image;
+        private Set<Category> categories;
+
+        public ProductBuilder(String name, double price, int quantity) {
+            if (price < 0) {
+                throw new IllegalArgumentException("Price cannot be negative");
+            }
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity cannot be negative");
+            }
+            this.name = name;
+            this.price = price;
+            this.quantity = quantity;
+        }
+
+        public ProductBuilder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public ProductBuilder setImage(String image) {
+            this.image = image;
+            return this;
+        }
+
+        public ProductBuilder setCategories(Set<Category> categories) {
+            this.categories = categories;
+            return this;
+        }
+
+        public Product build() {
+            return new Product(this);
+        }
     }
 }

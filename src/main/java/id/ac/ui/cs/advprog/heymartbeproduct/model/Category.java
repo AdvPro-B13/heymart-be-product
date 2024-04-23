@@ -16,9 +16,9 @@ public class Category {
     @ManyToMany(mappedBy = "categories")
     private Set<Product> products;
 
-    public Category(String name) {
-        this.name = name;
-        this.products = new HashSet<>();
+    private Category(CategoryBuilder builder) {
+        this.name = builder.name;
+        this.products = builder.products != null ? new HashSet<>(builder.products) : new HashSet<>();
     }
 
     public void addProduct(Product product) {
@@ -36,6 +36,24 @@ public class Category {
         if (this.products.contains(product)) {
             this.products.remove(product);
             product.getCategories().remove(this);
+        }
+    }
+
+    public static class CategoryBuilder {
+        private String name;
+        private Set<Product> products;
+
+        public CategoryBuilder(String name) {
+            this.name = name;
+        }
+
+        public CategoryBuilder setProducts(Set<Product> products) {
+            this.products = products;
+            return this;
+        }
+
+        public Category build() {
+            return new Category(this);
         }
     }
 }

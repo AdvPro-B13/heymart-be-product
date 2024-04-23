@@ -17,14 +17,14 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        this.product = new Product();
-        this.category = new Category("Category1");
+        this.category = new Category.CategoryBuilder("Category1")
+                .setProducts(new HashSet<>())
+                .build();
+        this.product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
         this.product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        this.product.setName("Product1");
-        this.product.setPrice(4.99);
-        this.product.setDescription("This is Product1");
-        this.product.setQuantity(10);
-        this.product.setImage("image.jpg");
     }
 
     @Test
@@ -81,7 +81,9 @@ class ProductTest {
 
     @Test
     void testRemoveCategoryNotInProduct() {
-        Category category2 = new Category("Category2");
+        Category category2 = new Category.CategoryBuilder("Category2")
+                .setProducts(new HashSet<>())
+                .build();
         product.addCategory(category);
         product.removeCategory(category2);
         assertTrue(product.getCategories().contains(category));
@@ -89,11 +91,12 @@ class ProductTest {
 
     @Test
     void testSetNegativePrice() {
-        assertThrows(IllegalArgumentException.class, () -> product.setPrice(-1.0));
+        assertThrows(IllegalArgumentException.class, () -> new Product.ProductBuilder("Product2", -1.0, 1).build());
     }
 
     @Test
     void testSetNegativeQuantity() {
-        assertThrows(IllegalArgumentException.class, () -> product.setQuantity(-1));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Product.ProductBuilder("Product2", 1.0, -1).build());
     }
 }

@@ -30,19 +30,18 @@ class ProductServiceImplTest {
 
     @Test
     void testCreateProduct() {
-        Product product = new Product();
-        when(productRepository.findProductById(product.getId())).thenReturn(Optional.empty());
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         when(productRepository.saveProduct(product)).thenReturn(product);
 
-        Product createdProduct = productService.create(product);
+        Product savedProduct = productService.create(product);
 
-        assertEquals(product, createdProduct);
-        verify(productRepository, times(1)).saveProduct(product);
+        assertEquals(product, savedProduct);
+        verify(productRepository, times(1)).findProductById(product.getId());
     }
 
     @Test
     void testCreateProductWithExistingId() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
 
         assertThrows(IllegalArgumentException.class, () -> productService.create(product));
@@ -55,14 +54,14 @@ class ProductServiceImplTest {
 
     @Test
     void testFindProductById() {
-        Product product = new Product();
-        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6"))
-                .thenReturn(Optional.of(product));
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        String productId = product.getId();
+        when(productRepository.findProductById(productId)).thenReturn(Optional.of(product));
 
-        Product foundProduct = productService.findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        Product foundProduct = productService.findById(productId);
 
         assertEquals(product, foundProduct);
-        verify(productRepository, times(1)).findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        verify(productRepository, times(1)).findProductById(productId);
     }
 
     @Test
@@ -86,7 +85,7 @@ class ProductServiceImplTest {
 
     @Test
     void testEditProduct() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
         when(productRepository.saveProduct(product)).thenReturn(product);
 
@@ -98,7 +97,7 @@ class ProductServiceImplTest {
 
     @Test
     void testEditProductNotFound() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> productService.edit(product));
@@ -111,13 +110,18 @@ class ProductServiceImplTest {
 
     @Test
     void testDeleteProductById() {
-        when(productRepository.findProductById("eb558e9f-1c39-460e-8860-71af6af63bd6"))
-                .thenReturn(Optional.of(new Product()));
-        doNothing().when(productRepository).deleteProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        when(productRepository.saveProduct(product)).thenReturn(product);
 
-        productService.deleteById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        Product savedProduct = productService.create(product);
+        String productId = savedProduct.getId();
 
-        verify(productRepository, times(1)).deleteProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        when(productRepository.findProductById(productId)).thenReturn(Optional.of(savedProduct));
+        doNothing().when(productRepository).deleteProductById(productId);
+
+        productService.deleteById(productId);
+
+        verify(productRepository, times(1)).deleteProductById(productId);
     }
 
     @Test
@@ -140,8 +144,8 @@ class ProductServiceImplTest {
 
     @Test
     void testGetAllProducts() {
-        Product product1 = new Product();
-        Product product2 = new Product();
+        Product product1 = new Product.ProductBuilder("Product 1", 5.0, 2).build();
+        Product product2 = new Product.ProductBuilder("Product 2", 1.99, 3).build();
         List<Product> products = Arrays.asList(product1, product2);
         when(productRepository.getAllProducts()).thenReturn(products);
 

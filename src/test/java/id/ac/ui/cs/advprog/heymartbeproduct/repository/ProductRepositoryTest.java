@@ -33,7 +33,10 @@ class ProductRepositoryTest {
 
     @Test
     void testFindProductById() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
         product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
         when(entityManager.find(Product.class, "eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(product);
@@ -47,7 +50,10 @@ class ProductRepositoryTest {
 
     @Test
     void testSaveProduct() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(null);
 
@@ -59,13 +65,19 @@ class ProductRepositoryTest {
 
     @Test
     void testUpdateProduct() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
         product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
         product.setName("Old Product Name");
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(product);
 
-        Product updatedProduct = new Product();
+        Product updatedProduct = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
         updatedProduct.setId(product.getId());
         updatedProduct.setName("New Product Name");
 
@@ -80,7 +92,10 @@ class ProductRepositoryTest {
 
     @Test
     void testDeleteProductById() {
-        Product product = new Product();
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
         product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
         when(entityManager.find(Product.class, "eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(product);
@@ -92,10 +107,14 @@ class ProductRepositoryTest {
 
     @Test
     void testGetAllProducts() {
-        Product product1 = new Product();
+        Product product1 = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .build();
         product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
-        Product product2 = new Product();
+        Product product2 = new Product.ProductBuilder("Product2", 4.99, 10)
+                .setDescription("This is Product2")
+                .build();
         product2.setId("gb128e9b-4a31-111e-7277-71af1cq63bd2");
 
         List<Product> products = Arrays.asList(product1, product2);
