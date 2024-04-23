@@ -93,6 +93,9 @@ public class Product {
             this.quantity = quantity;
         }
 
+        public ProductBuilder() {
+        }
+
         public ProductBuilder setDescription(String description) {
             this.description = description;
             return this;
