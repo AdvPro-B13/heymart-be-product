@@ -10,12 +10,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class CategoryServiceImplTest {
 
@@ -104,5 +109,62 @@ public class CategoryServiceImplTest {
         categoryService.removeProductFromCategory("Electronics", product);
 
         verify(categoryRepository, times(1)).removeProductFromCategory("Electronics", product);
+    }
+
+    @Test
+    public void testCreateWithNullCategory() {
+        assertThrows(IllegalArgumentException.class, () -> categoryService.create(null));
+    }
+
+    @Test
+    public void testCreateWithExistingCategory() {
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
+        assertThrows(IllegalArgumentException.class, () -> categoryService.create(category));
+    }
+
+    @Test
+    public void testFindByNameWithNullName() {
+        assertThrows(IllegalArgumentException.class, () -> categoryService.findByName(null));
+    }
+
+    @Test
+    public void testFindByNameWithNonExistingCategory() {
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> categoryService.findByName("Electronics"));
+    }
+
+    @Test
+    public void testEditWithNonExistingCategory() {
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> categoryService.edit(category));
+    }
+
+    @Test
+    public void testDeleteByNameWithNonExistingCategory() {
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> categoryService.deleteByName("Electronics"));
+    }
+
+    @Test
+    public void testAddProductToCategoryWithEmptyCategoryName() {
+        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        assertThrows(IllegalArgumentException.class, () -> categoryService.addProductToCategory("", product));
+    }
+
+    @Test
+    public void testAddProductToCategoryWithNullProduct() {
+        assertThrows(IllegalArgumentException.class, () -> categoryService.addProductToCategory("Electronics", null));
+    }
+
+    @Test
+    public void testRemoveProductFromCategoryWithEmptyCategoryName() {
+        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        assertThrows(IllegalArgumentException.class, () -> categoryService.removeProductFromCategory("", product));
+    }
+
+    @Test
+    public void testRemoveProductFromCategoryWithNullProduct() {
+        assertThrows(IllegalArgumentException.class,
+                () -> categoryService.removeProductFromCategory("Electronics", null));
     }
 }
