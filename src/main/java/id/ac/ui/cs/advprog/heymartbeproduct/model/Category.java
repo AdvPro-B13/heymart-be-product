@@ -8,15 +8,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "category")
 @Getter
 @Setter
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToMany(mappedBy = "categories")
-    private Set<Product> products;
+    private Set<Product> products = new HashSet<>();
+
+    public Category() {
+    }
 
     private Category(CategoryBuilder builder) {
         this.name = builder.name;

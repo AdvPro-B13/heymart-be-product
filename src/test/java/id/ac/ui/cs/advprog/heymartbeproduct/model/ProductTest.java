@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ class ProductTest {
         this.product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
+                .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
                 .build();
         this.product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
     }

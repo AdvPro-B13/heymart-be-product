@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
@@ -29,12 +30,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product findById(String id) {
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
-        return productRepository.findProductById(id)
+        Product product = productRepository.findProductById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
+        product.getCategories().size();
+        return product;
     }
 
     @Override

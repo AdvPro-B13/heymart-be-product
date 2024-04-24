@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.heymartbeproduct.service;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.CategoryRepository;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void removeProductFromCategory(String categoryName, Product product) {
         if (categoryName == null || categoryName.isEmpty()) {
             throw new IllegalArgumentException("Category name cannot be null or empty");
@@ -84,6 +86,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
-        categoryRepository.removeProductFromCategory(categoryName, product);
+        Category category = categoryRepository.findCategoryByName(categoryName)
+                .orElseThrow(() -> new IllegalArgumentException("Category isn't found"));
+        category.getProducts().remove(product);
+        categoryRepository.saveCategory(category);
     }
+
 }

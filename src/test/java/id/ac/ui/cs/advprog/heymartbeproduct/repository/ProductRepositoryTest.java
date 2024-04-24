@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ class ProductRepositoryTest {
         Product product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
+                .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
                 .build();
         product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 

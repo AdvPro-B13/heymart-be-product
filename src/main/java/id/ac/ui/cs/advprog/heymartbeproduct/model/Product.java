@@ -9,21 +9,39 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "product")
 @Getter
 @Setter
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "price", nullable = false)
     private double price;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    @Column(name = "image")
     private String image;
 
     @ManyToMany
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "name"))
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
+
+    @Transient
+    private Set<String> categoryNames = new HashSet<>();
+
+    public Product() {
+        this.id = UUID.randomUUID().toString();
+    }
 
     private Product(ProductBuilder builder) {
         this.id = UUID.randomUUID().toString();
@@ -80,6 +98,7 @@ public class Product {
         private String description;
         private String image;
         private Set<Category> categories;
+        private Set<String> categoryNames;
 
         public ProductBuilder(String name, double price, int quantity) {
             if (price < 0) {
@@ -111,8 +130,15 @@ public class Product {
             return this;
         }
 
+        public ProductBuilder setCategoryNames(Set<String> categoryNames) {
+            this.categoryNames = categoryNames;
+            return this;
+        }
+
         public Product build() {
-            return new Product(this);
+            Product product = new Product(this);
+            product.setCategoryNames(this.categoryNames);
+            return product;
         }
     }
 }
