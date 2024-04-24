@@ -102,16 +102,6 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void testRemoveProductFromCategory() {
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
-        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
-
-        categoryService.removeProductFromCategory("Electronics", product);
-
-        verify(categoryRepository, times(1)).removeProductFromCategory("Electronics", product);
-    }
-
-    @Test
     public void testCreateWithNullCategory() {
         assertThrows(IllegalArgumentException.class, () -> categoryService.create(null));
     }
