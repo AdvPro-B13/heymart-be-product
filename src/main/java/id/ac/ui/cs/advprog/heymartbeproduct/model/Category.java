@@ -5,20 +5,26 @@ import java.util.HashSet;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Table(name = "category")
 @Getter
+@Setter
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToMany(mappedBy = "categories")
-    private Set<Product> products;
+    private Set<Product> products = new HashSet<>();
 
-    public Category(String name) {
-        this.name = name;
-        this.products = new HashSet<>();
+    public Category() {
+    }
+
+    private Category(CategoryBuilder builder) {
+        this.name = builder.name;
+        this.products = builder.products != null ? new HashSet<>(builder.products) : new HashSet<>();
     }
 
     public void addProduct(Product product) {
@@ -36,6 +42,24 @@ public class Category {
         if (this.products.contains(product)) {
             this.products.remove(product);
             product.getCategories().remove(this);
+        }
+    }
+
+    public static class CategoryBuilder {
+        private String name;
+        private Set<Product> products;
+
+        public CategoryBuilder(String name) {
+            this.name = name;
+        }
+
+        public CategoryBuilder setProducts(Set<Product> products) {
+            this.products = products;
+            return this;
+        }
+
+        public Category build() {
+            return new Category(this);
         }
     }
 }

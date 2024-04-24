@@ -9,33 +9,48 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "product")
 @Getter
 @Setter
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "price", nullable = false)
     private double price;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    @Column(name = "image")
     private String image;
 
     @ManyToMany
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "name"))
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
 
-    public Product(String name, double price, String description, int quantity, String image) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.quantity = quantity;
-        this.image = image;
-    }
+    @Transient
+    private Set<String> categoryNames = new HashSet<>();
 
     public Product() {
         this.id = UUID.randomUUID().toString();
+    }
+
+    private Product(ProductBuilder builder) {
+        this.id = UUID.randomUUID().toString();
+        this.name = builder.name;
+        this.price = builder.price;
+        this.description = builder.description;
+        this.quantity = builder.quantity;
+        this.image = builder.image;
+        this.categories = builder.categories != null ? new HashSet<>(builder.categories) : new HashSet<>();
     }
 
     public void setPrice(double price) {
@@ -71,5 +86,59 @@ public class Product {
             categories.remove(category);
         }
         category.getProducts().remove(this);
+    }
+
+    public static class ProductBuilder {
+        // Required parameters
+        private String name;
+        private double price;
+        private int quantity;
+
+        // Optional parameters
+        private String description;
+        private String image;
+        private Set<Category> categories;
+        private Set<String> categoryNames;
+
+        public ProductBuilder(String name, double price, int quantity) {
+            if (price < 0) {
+                throw new IllegalArgumentException("Price cannot be negative");
+            }
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity cannot be negative");
+            }
+            this.name = name;
+            this.price = price;
+            this.quantity = quantity;
+        }
+
+        public ProductBuilder() {
+        }
+
+        public ProductBuilder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public ProductBuilder setImage(String image) {
+            this.image = image;
+            return this;
+        }
+
+        public ProductBuilder setCategories(Set<Category> categories) {
+            this.categories = categories;
+            return this;
+        }
+
+        public ProductBuilder setCategoryNames(Set<String> categoryNames) {
+            this.categoryNames = categoryNames;
+            return this;
+        }
+
+        public Product build() {
+            Product product = new Product(this);
+            product.setCategoryNames(this.categoryNames);
+            return product;
+        }
     }
 }
