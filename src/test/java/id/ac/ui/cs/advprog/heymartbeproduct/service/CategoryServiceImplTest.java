@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.CategoryBuilder;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.ProductBuilder;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.CategoryRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +37,7 @@ public class CategoryServiceImplTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        category = new Category.CategoryBuilder("Electronics").build();
+        category = new CategoryBuilder("Electronics").build();
     }
 
     @Test
@@ -81,7 +83,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void testGetAllCategories() {
-        Category category2 = new Category.CategoryBuilder("Books").build();
+        Category category2 = new CategoryBuilder("Books").build();
         List<Category> categories = Arrays.asList(category, category2);
         when(categoryRepository.getAllCategories()).thenReturn(categories);
 
@@ -93,7 +95,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void testAddProductToCategory() {
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        Product product = new ProductBuilder("TV", 100.0, 10).build();
         when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
 
         categoryService.addProductToCategory("Electronics", product);
@@ -137,7 +139,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void testAddProductToCategoryWithEmptyCategoryName() {
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        Product product = new ProductBuilder("TV", 100.0, 10).build();
         assertThrows(IllegalArgumentException.class, () -> categoryService.addProductToCategory("", product));
     }
 
@@ -148,7 +150,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void testRemoveProductFromCategoryWithEmptyCategoryName() {
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        Product product = new ProductBuilder("TV", 100.0, 10).build();
         assertThrows(IllegalArgumentException.class, () -> categoryService.removeProductFromCategory("", product));
     }
 

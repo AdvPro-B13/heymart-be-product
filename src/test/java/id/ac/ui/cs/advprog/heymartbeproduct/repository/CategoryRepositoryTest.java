@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.heymartbeproduct.repository;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.CategoryBuilder;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.ProductBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +40,7 @@ public class CategoryRepositoryTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        category = new Category.CategoryBuilder("Electronics").build();
+        category = new CategoryBuilder("Electronics").build();
     }
 
     @Test
@@ -73,7 +75,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testGetAllCategories() {
-        Category category2 = new Category.CategoryBuilder("Books").build();
+        Category category2 = new CategoryBuilder("Books").build();
 
         List<Category> categories = Arrays.asList(category, category2);
 
@@ -88,7 +90,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testAddProductToCategory() {
-        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
+        Product product = new ProductBuilder("Product1", 100.0, 10).build();
 
         when(entityManager.find(Category.class, "Electronics")).thenReturn(category);
 
@@ -101,8 +103,8 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testRemoveProductFromCategory() {
-        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
-        Category category3 = new Category.CategoryBuilder("Drinks")
+        Product product = new ProductBuilder("Product1", 100.0, 10).build();
+        Category category3 = new CategoryBuilder("Drinks")
                 .setProducts(new HashSet<>(Arrays.asList(product)))
                 .build();
 
@@ -148,7 +150,7 @@ public class CategoryRepositoryTest {
     @Test
     public void testAddProductToCategoryNotFound() {
         when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
-        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
+        Product product = new ProductBuilder("Product1", 100.0, 10).build();
 
         assertThrows(IllegalArgumentException.class, () -> {
             categoryRepository.addProductToCategory("NonExistent", product);
@@ -158,7 +160,7 @@ public class CategoryRepositoryTest {
     @Test
     public void testRemoveProductFromCategoryNotFound() {
         when(entityManager.find(Category.class, "NonExistent")).thenReturn(null);
-        Product product = new Product.ProductBuilder("Product1", 100.0, 10).build();
+        Product product = new ProductBuilder("Product1", 100.0, 10).build();
 
         assertThrows(IllegalArgumentException.class, () -> {
             categoryRepository.removeProductFromCategory("NonExistent", product);
