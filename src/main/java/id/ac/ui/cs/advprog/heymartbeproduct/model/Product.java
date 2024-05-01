@@ -32,7 +32,7 @@ public class Product {
     @Column(name = "image")
     private String image;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "name"))
     private Set<Category> categories = new HashSet<>();
 
@@ -86,6 +86,16 @@ public class Product {
             categories.remove(category);
         }
         category.getProducts().remove(this);
+    }
+
+    public void updateCategory(Category oldCategory, Category newCategory) {
+        if (oldCategory == null || newCategory == null) {
+            throw new NullPointerException();
+        }
+        if (categories != null && categories.contains(oldCategory)) {
+            categories.remove(oldCategory);
+            categories.add(newCategory);
+        }
     }
 
     public static class ProductBuilder {

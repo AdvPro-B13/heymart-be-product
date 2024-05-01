@@ -1,5 +1,7 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
+import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,9 @@ class ProductServiceImplTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private ProductMapper productMapper;
+
     @InjectMocks
     private ProductServiceImpl productService;
 
@@ -31,20 +36,25 @@ class ProductServiceImplTest {
     @Test
     void testCreateProduct() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductDto productDto = new ProductDto();
+        when(productMapper.convertToEntity(productDto)).thenReturn(product);
         when(productRepository.saveProduct(product)).thenReturn(product);
+        when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        Product savedProduct = productService.create(product);
+        ProductDto savedProductDto = productService.create(productDto);
 
-        assertEquals(product, savedProduct);
+        assertEquals(productDto, savedProductDto);
         verify(productRepository, times(1)).findProductById(product.getId());
     }
 
     @Test
     void testCreateProductWithExistingId() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductDto productDto = new ProductDto();
+        when(productMapper.convertToEntity(productDto)).thenReturn(product);
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
 
-        assertThrows(IllegalArgumentException.class, () -> productService.create(product));
+        assertThrows(IllegalArgumentException.class, () -> productService.create(productDto));
     }
 
     @Test
@@ -55,12 +65,14 @@ class ProductServiceImplTest {
     @Test
     void testFindProductById() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductDto productDto = new ProductDto();
         String productId = product.getId();
         when(productRepository.findProductById(productId)).thenReturn(Optional.of(product));
+        when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        Product foundProduct = productService.findById(productId);
+        ProductDto foundProductDto = productService.findById(productId);
 
-        assertEquals(product, foundProduct);
+        assertEquals(productDto, foundProductDto);
         verify(productRepository, times(1)).findProductById(productId);
     }
 
@@ -86,21 +98,26 @@ class ProductServiceImplTest {
     @Test
     void testEditProduct() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductDto productDto = new ProductDto();
+        when(productMapper.convertToEntity(productDto)).thenReturn(product);
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
         when(productRepository.saveProduct(product)).thenReturn(product);
+        when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        Product editedProduct = productService.edit(product);
+        ProductDto editedProductDto = productService.edit(productDto);
 
-        assertEquals(product, editedProduct);
+        assertEquals(productDto, editedProductDto);
         verify(productRepository, times(1)).saveProduct(product);
     }
 
     @Test
     void testEditProductNotFound() {
+        ProductDto productDto = new ProductDto();
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        when(productMapper.convertToEntity(productDto)).thenReturn(product);
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> productService.edit(product));
+        assertThrows(IllegalArgumentException.class, () -> productService.edit(productDto));
     }
 
     @Test
@@ -111,16 +128,20 @@ class ProductServiceImplTest {
     @Test
     void testDeleteProductById() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductDto productDto = new ProductDto();
+        productDto.setId(product.getId());
+        when(productMapper.convertToEntity(productDto)).thenReturn(product);
         when(productRepository.saveProduct(product)).thenReturn(product);
+        when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        Product savedProduct = productService.create(product);
-        String productId = savedProduct.getId();
+        ProductDto savedProductDto = productService.create(productDto);
+        String productId = savedProductDto.getId();
 
-        when(productRepository.findProductById(productId)).thenReturn(Optional.of(savedProduct));
+        assertNotNull(productId, "Product ID should not be null");
+        when(productRepository.findProductById(productId)).thenReturn(Optional.of(product));
         doNothing().when(productRepository).deleteProductById(productId);
 
         productService.deleteById(productId);
-
         verify(productRepository, times(1)).deleteProductById(productId);
     }
 
@@ -146,12 +167,17 @@ class ProductServiceImplTest {
     void testGetAllProducts() {
         Product product1 = new Product.ProductBuilder("Product 1", 5.0, 2).build();
         Product product2 = new Product.ProductBuilder("Product 2", 1.99, 3).build();
+        ProductDto productDto1 = new ProductDto();
+        ProductDto productDto2 = new ProductDto();
         List<Product> products = Arrays.asList(product1, product2);
+        List<ProductDto> productDtos = Arrays.asList(productDto1, productDto2);
         when(productRepository.getAllProducts()).thenReturn(products);
+        when(productMapper.convertToDto(product1)).thenReturn(productDto1);
+        when(productMapper.convertToDto(product2)).thenReturn(productDto2);
 
-        List<Product> returnedProducts = productService.getAllProducts();
+        List<ProductDto> returnedProductDtos = productService.getAllProducts();
 
-        assertEquals(products, returnedProducts);
+        assertEquals(productDtos, returnedProductDtos);
         verify(productRepository, times(1)).getAllProducts();
     }
 }
