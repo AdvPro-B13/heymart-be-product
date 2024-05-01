@@ -5,6 +5,7 @@ import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import java.util.Set;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,11 @@ public class CategoryRepository {
 
     @Transactional
     public Optional<Category> findCategoryByName(String name) {
-        Category category = entityManager.find(Category.class, name);
-        return Optional.ofNullable(category);
+        List<Category> categories = entityManager
+                .createQuery("SELECT c FROM Category c WHERE c.name = :name", Category.class)
+                .setParameter("name", name)
+                .getResultList();
+        return categories.isEmpty() ? Optional.empty() : Optional.of(categories.get(0));
     }
 
     @Transactional
@@ -35,6 +39,13 @@ public class CategoryRepository {
     public void deleteCategoryByName(String name) {
         Category category = findCategoryByName(name)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+        Set<Product> products = category.getProducts();
+
+        for (Product product : products) {
+            product.getCategories().remove(category);
+            entityManager.merge(product);
+        }
         entityManager.remove(category);
     }
 

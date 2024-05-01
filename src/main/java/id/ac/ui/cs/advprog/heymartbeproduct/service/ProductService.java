@@ -1,20 +1,20 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
+import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
+
+import java.util.List;
 
 @Service
 public interface ProductService {
-    Product create(Product product);
+    ProductDto create(ProductDto productDto);
 
-    Product findById(String id);
+    ProductDto findById(String id);
 
-    Product edit(Product product);
+    ProductDto edit(ProductDto productDto);
 
     void deleteById(String id);
 
-    List<Product> getAllProducts();
+    List<ProductDto> getAllProducts();
 }

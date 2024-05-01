@@ -1,55 +1,61 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
-import java.util.List;
-
+import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
+import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
-import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     @Override
-    public Product create(Product product) {
+    public ProductDto create(ProductDto productDto) {
+        Product product = productMapper.convertToEntity(productDto);
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
         if (productRepository.findProductById(product.getId()).isPresent()) {
             throw new IllegalArgumentException("Product with this ID already exists");
         }
-        return productRepository.saveProduct(product);
+        return productMapper.convertToDto(productRepository.saveProduct(product));
     }
 
     @Override
     @Transactional
-    public Product findById(String id) {
+    public ProductDto findById(String id) {
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
         Product product = productRepository.findProductById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         product.getCategories().size();
-        return product;
+        return productMapper.convertToDto(product);
     }
 
     @Override
-    public Product edit(Product product) {
+    public ProductDto edit(ProductDto productDto) {
+        Product product = productMapper.convertToEntity(productDto);
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
         if (!productRepository.findProductById(product.getId()).isPresent()) {
             throw new IllegalArgumentException("Product not found");
         }
-        return productRepository.saveProduct(product);
+        return productMapper.convertToDto(productRepository.saveProduct(product));
     }
 
     @Override
@@ -64,7 +70,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.getAllProducts();
+    public List<ProductDto> getAllProducts() {
+        return productRepository.getAllProducts().stream()
+                .map(productMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 }

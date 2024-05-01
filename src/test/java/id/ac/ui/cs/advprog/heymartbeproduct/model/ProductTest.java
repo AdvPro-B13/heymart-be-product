@@ -3,9 +3,6 @@ package id.ac.ui.cs.advprog.heymartbeproduct.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.CategoryBuilder;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.ProductBuilder;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,10 +18,10 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        this.category = new CategoryBuilder("Category1")
+        this.category = new Category.CategoryBuilder("Category1")
                 .setProducts(new HashSet<>())
                 .build();
-        this.product = new ProductBuilder("Product1", 4.99, 10)
+        this.product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
@@ -86,7 +83,7 @@ class ProductTest {
 
     @Test
     void testRemoveCategoryNotInProduct() {
-        Category category2 = new CategoryBuilder("Category2")
+        Category category2 = new Category.CategoryBuilder("Category2")
                 .setProducts(new HashSet<>())
                 .build();
         product.addCategory(category);
@@ -96,12 +93,12 @@ class ProductTest {
 
     @Test
     void testSetNegativePrice() {
-        assertThrows(IllegalArgumentException.class, () -> new ProductBuilder("Product2", -1.0, 1).build());
+        assertThrows(IllegalArgumentException.class, () -> new Product.ProductBuilder("Product2", -1.0, 1).build());
     }
 
     @Test
     void testSetNegativeQuantity() {
         assertThrows(IllegalArgumentException.class,
-                () -> new ProductBuilder("Product2", 1.0, -1).build());
+                () -> new Product.ProductBuilder("Product2", 1.0, -1).build());
     }
 }

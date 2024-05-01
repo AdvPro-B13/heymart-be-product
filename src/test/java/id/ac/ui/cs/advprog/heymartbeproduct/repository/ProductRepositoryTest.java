@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.Builder.ProductBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
@@ -35,7 +34,7 @@ class ProductRepositoryTest {
 
     @Test
     void testFindProductById() {
-        Product product = new ProductBuilder("Product1", 4.99, 10)
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
@@ -53,7 +52,7 @@ class ProductRepositoryTest {
 
     @Test
     void testSaveProduct() {
-        Product product = new ProductBuilder("Product1", 4.99, 10)
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
@@ -68,7 +67,7 @@ class ProductRepositoryTest {
 
     @Test
     void testUpdateProduct() {
-        Product product = new ProductBuilder("Product1", 4.99, 10)
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
@@ -77,7 +76,7 @@ class ProductRepositoryTest {
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(product);
 
-        Product updatedProduct = new ProductBuilder("Product1", 4.99, 10)
+        Product updatedProduct = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
@@ -95,7 +94,7 @@ class ProductRepositoryTest {
 
     @Test
     void testDeleteProductById() {
-        Product product = new ProductBuilder("Product1", 4.99, 10)
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
@@ -110,12 +109,12 @@ class ProductRepositoryTest {
 
     @Test
     void testGetAllProducts() {
-        Product product1 = new ProductBuilder("Product1", 4.99, 10)
+        Product product1 = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .build();
         product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
-        Product product2 = new ProductBuilder("Product2", 4.99, 10)
+        Product product2 = new Product.ProductBuilder("Product2", 4.99, 10)
                 .setDescription("This is Product2")
                 .build();
         product2.setId("gb128e9b-4a31-111e-7277-71af1cq63bd2");
