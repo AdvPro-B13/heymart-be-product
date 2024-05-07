@@ -3,6 +3,7 @@ name: Github CI
 on:
   push:
     branches:
+      - main
       - staging
 
 jobs:
@@ -18,6 +19,12 @@ jobs:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
@@ -27,14 +34,23 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
+        run: ./gradlew build sonar --info
       - name: Build with Gradle
         run: |
           ./gradlew assemble
+        env:
+          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: java-app
           path: build/libs/*.jar
+
 
   test:
     name: Test
@@ -63,6 +79,9 @@ jobs:
           ./gradlew check --info --stacktrace
           ./gradlew test
           ./gradlew jacocoTestReport
+        env:
+          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
+
   publish:
     name: Publish Docker Image
     runs-on: ubuntu-latest
@@ -86,8 +105,13 @@ jobs:
         run: export DOCKER_BUILDKIT=1
       - name: Build Docker Image
         run: |
-          docker build --build-arg PRODUCTION=$PRODUCTION --build-arg JDBC_DATABASE_PASSWORD=$JDBC_DATABASE_PASSWORD --build-arg JDBC_DATABASE_URL=$JDBC_DATABASE_URL --build-arg JDBC_DATABASE_USERNAME=$JDBC_DATABASE_USERNAME -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
+          docker build --build-arg PRODUCTION='${{ secrets.PRODUCTION }}' \
+          --build-arg JDBC_DATABASE_PASSWORD='${{ secrets.JDBC_DATABASE_PASSWORD }}' \
+          --build-arg JDBC_DATABASE_URL='${{ secrets.JDBC_DATABASE_URL }}' \
+          --build-arg JDBC_DATABASE_USERNAME='${{ secrets.JDBC_DATABASE_USERNAME }}' \
+          -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
           docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+
   deploy:
     name: Deploy to GCP
     runs-on: ubuntu-latest

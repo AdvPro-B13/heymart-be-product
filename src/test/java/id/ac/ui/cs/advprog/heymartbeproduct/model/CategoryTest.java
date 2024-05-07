@@ -14,6 +14,11 @@ class CategoryTest {
     }
 
     @Test
+    void testGetId() {
+        assertNull(category.getId());
+    }
+
+    @Test
     void testGetName() {
         assertEquals("Electronics", category.getName());
     }
@@ -37,5 +42,14 @@ class CategoryTest {
         category.addProduct(product);
         category.removeProduct(product2);
         assertTrue(category.getProducts().contains(product));
+        assertFalse(category.getProducts().contains(product2));
+    }
+
+    @Test
+    void testRemoveProductInCategory() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10).build();
+        category.addProduct(product);
+        category.removeProduct(product);
+        assertFalse(category.getProducts().contains(product));
     }
 }

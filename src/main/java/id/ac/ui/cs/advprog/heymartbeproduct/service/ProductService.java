@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
 import org.springframework.stereotype.Service;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.controller;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
 import id.ac.ui.cs.advprog.heymartbeproduct.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

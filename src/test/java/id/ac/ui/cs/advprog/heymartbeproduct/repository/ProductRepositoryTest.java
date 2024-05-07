@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
@@ -143,5 +144,78 @@ class ProductRepositoryTest {
 
         assertTrue(result.isEmpty());
         verify(entityManager, times(1)).createQuery("SELECT p FROM Product p", Product.class);
+    }
+
+    @Test
+    void testSaveProductWhenProductDoesNotExist() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
+        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        when(entityManager.find(Product.class, product.getId())).thenReturn(null);
+
+        Product result = productRepository.saveProduct(product);
+
+        verify(entityManager, times(1)).persist(product);
+        assertEquals(product, result);
+    }
+
+    @Test
+    void testDeleteProductByIdWhenProductExists() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
+        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        when(entityManager.find(Product.class, product.getId())).thenReturn(product);
+
+        productRepository.deleteProductById(product.getId());
+
+        verify(entityManager, times(1)).remove(product);
+    }
+
+    @Test
+    void testSaveProductWhenProductIdIsNull() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
+
+        when(entityManager.find(Product.class, product.getId())).thenReturn(null);
+
+        Product result = productRepository.saveProduct(product);
+
+        verify(entityManager, times(1)).persist(product);
+        assertEquals(product, result);
+    }
+
+    @Test
+    void testDeleteProductByIdWhenProductDoesNotExist() {
+        String id = "nonexistentId";
+        when(entityManager.find(Product.class, id)).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> productRepository.deleteProductById(id));
+        verify(entityManager, times(0)).remove(any());
+    }
+
+    @Test
+    void testSaveProductWhenProductExists() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
+        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        when(entityManager.find(Product.class, product.getId())).thenReturn(product);
+        when(entityManager.merge(product)).thenReturn(product);
+
+        Product result = productRepository.saveProduct(product);
+
+        verify(entityManager, times(0)).persist(product);
+        verify(entityManager, times(1)).merge(product);
+        assertEquals(product, result);
     }
 }

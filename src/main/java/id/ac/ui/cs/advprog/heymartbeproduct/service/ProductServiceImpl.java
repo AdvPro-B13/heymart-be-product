@@ -1,8 +1,8 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.Dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,6 @@ public class ProductServiceImpl implements ProductService {
         }
         Product product = productRepository.findProductById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
-        product.getCategories().size();
         return productMapper.convertToDto(product);
     }
 

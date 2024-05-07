@@ -13,7 +13,11 @@ import lombok.Setter;
 @Setter
 public class Category {
     @Id
-    @Column(name = "name", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "categories")
@@ -23,6 +27,7 @@ public class Category {
     }
 
     private Category(CategoryBuilder builder) {
+        this.id = builder.id;
         this.name = builder.name;
         this.products = builder.products != null ? new HashSet<>(builder.products) : new HashSet<>();
     }
@@ -46,11 +51,17 @@ public class Category {
     }
 
     public static class CategoryBuilder {
+        private Long id;
         private String name;
         private Set<Product> products;
 
         public CategoryBuilder(String name) {
             this.name = name;
+        }
+
+        public CategoryBuilder setName(String name) {
+            this.name = name;
+            return this;
         }
 
         public CategoryBuilder setProducts(Set<Product> products) {
