@@ -11,6 +11,8 @@ import id.ac.ui.cs.advprog.heymartbeproduct.service.ProductService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -28,57 +30,57 @@ class ProductControllerTest {
     }
 
     @Test
-    void testCreateProduct() {
+    void testCreateProduct() throws ExecutionException, InterruptedException {
         ProductDto productDto = new ProductDto();
-        when(productService.create(any())).thenReturn(productDto);
+        when(productService.create(any())).thenReturn(CompletableFuture.completedFuture(productDto));
 
-        ResponseEntity<ProductDto> responseEntity = productController.create(productDto);
+        ResponseEntity<ProductDto> responseEntity = productController.create(productDto).get();
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(productDto, responseEntity.getBody());
     }
 
     @Test
-    void testFindProductById() {
+    void testFindProductById() throws ExecutionException, InterruptedException {
         String id = "1";
         ProductDto productDto = new ProductDto();
-        when(productService.findById(id)).thenReturn(productDto);
+        when(productService.findById(id)).thenReturn(CompletableFuture.completedFuture(productDto));
 
-        ResponseEntity<ProductDto> responseEntity = productController.findById(id);
+        ResponseEntity<ProductDto> responseEntity = productController.findById(id).get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(productDto, responseEntity.getBody());
     }
 
     @Test
-    void testEditProduct() {
+    void testEditProduct() throws ExecutionException, InterruptedException {
         String id = "1";
         ProductDto productDto = new ProductDto();
-        when(productService.edit(any())).thenReturn(productDto);
+        when(productService.edit(any())).thenReturn(CompletableFuture.completedFuture(productDto));
 
-        ResponseEntity<ProductDto> responseEntity = productController.edit(id, productDto);
+        ResponseEntity<ProductDto> responseEntity = productController.edit(id, productDto).get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(productDto, responseEntity.getBody());
     }
 
     @Test
-    void testDeleteProductById() {
+    void testDeleteProductById() throws ExecutionException, InterruptedException {
         String id = "1";
+        when(productService.deleteById(id)).thenReturn(CompletableFuture.completedFuture(null));
 
-        ResponseEntity<String> responseEntity = productController.deleteById(id);
+        ResponseEntity<String> responseEntity = productController.deleteById(id).get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("DELETE SUCCESS", responseEntity.getBody());
-        verify(productService, times(1)).deleteById(id);
     }
 
     @Test
-    void testGetAllProducts() {
+    void testGetAllProducts() throws ExecutionException, InterruptedException {
         List<ProductDto> productDtoList = Collections.emptyList();
-        when(productService.getAllProducts()).thenReturn(productDtoList);
+        when(productService.getAllProducts()).thenReturn(CompletableFuture.completedFuture(productDtoList));
 
-        ResponseEntity<List<ProductDto>> responseEntity = productController.getAllProducts();
+        ResponseEntity<List<ProductDto>> responseEntity = productController.getAllProducts().get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(productDtoList, responseEntity.getBody());

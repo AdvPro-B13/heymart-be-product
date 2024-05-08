@@ -5,16 +5,17 @@ import org.springframework.stereotype.Service;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public interface ProductService {
-    ProductDto create(ProductDto productDto);
+    CompletableFuture<ProductDto> create(ProductDto productDto);
 
-    ProductDto findById(String id);
+    CompletableFuture<ProductDto> findById(String id);
 
-    ProductDto edit(ProductDto productDto);
+    CompletableFuture<ProductDto> edit(ProductDto productDto);
 
-    void deleteById(String id);
+    CompletableFuture<Void> deleteById(String id);
 
-    List<ProductDto> getAllProducts();
+    CompletableFuture<List<ProductDto>> getAllProducts();
 }
