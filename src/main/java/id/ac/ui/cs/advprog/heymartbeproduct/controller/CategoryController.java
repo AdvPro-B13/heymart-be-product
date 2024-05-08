@@ -31,6 +31,11 @@ public class CategoryController {
         return new ResponseEntity<>(categoryService.findByName(name), HttpStatus.OK);
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<CategoryDto> findById(@PathVariable Long id) {
+        return new ResponseEntity<>(categoryService.findById(id), HttpStatus.OK);
+    }
+
     @PutMapping("edit/{id}")
     public ResponseEntity<CategoryDto> edit(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
         return new ResponseEntity<>(categoryService.edit(id, categoryDto), HttpStatus.OK);

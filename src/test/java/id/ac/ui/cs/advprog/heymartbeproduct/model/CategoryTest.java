@@ -52,4 +52,18 @@ class CategoryTest {
         category.removeProduct(product);
         assertFalse(category.getProducts().contains(product));
     }
+
+    @Test
+    void testCategoryBuilderSetName() {
+        Category.CategoryBuilder builder = new Category.CategoryBuilder("");
+        builder.setName("testName");
+        Category category = builder.build();
+
+        assertEquals("testName", category.getName());
+    }
+
+    @Test
+    void testRemoveProductWhenProductIsNull() {
+        assertThrows(NullPointerException.class, () -> category.removeProduct(null));
+    }
 }

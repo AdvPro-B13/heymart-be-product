@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +41,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new IllegalArgumentException("Category cannot be null");
         }
         Category category = categoryMapper.convertToEntity(categoryDto);
+        Set<Product> products = categoryDto.getProductIds().stream()
+                .map(productRepository::findProductById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+        products.forEach(category::addProduct);
         if (categoryRepository.findCategoryByName(category.getName()).isPresent()) {
             throw new IllegalArgumentException("Category with this name already exists");
         }
@@ -72,7 +80,10 @@ public class CategoryServiceImpl implements CategoryService {
                         .orElseThrow(() -> new IllegalArgumentException("Product not found")))
                 .collect(Collectors.toSet());
 
-        category.getProducts().stream()
+        Set<Product> oldProducts = new HashSet<>(category.getProducts());
+        category.setProducts(newProducts);
+
+        oldProducts.stream()
                 .filter(product -> !newProducts.contains(product))
                 .forEach(product -> {
                     product.getCategories().remove(category);
@@ -80,13 +91,12 @@ public class CategoryServiceImpl implements CategoryService {
                 });
 
         newProducts.stream()
-                .filter(product -> !category.getProducts().contains(product))
+                .filter(product -> !oldProducts.contains(product))
                 .forEach(product -> {
                     product.getCategories().add(category);
                     productRepository.saveProduct(product);
                 });
 
-        category.setProducts(newProducts);
         categoryRepository.saveCategory(category);
         return categoryMapper.convertToDto(category);
     }
