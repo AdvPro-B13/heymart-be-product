@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.Dto;
+package id.ac.ui.cs.advprog.heymartbeproduct.model.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
+    private Long id;
     private String name;
     private Set<String> productIds = new HashSet<>();
 

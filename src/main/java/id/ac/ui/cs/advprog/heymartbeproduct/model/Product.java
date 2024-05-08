@@ -71,31 +71,31 @@ public class Product {
         if (category == null) {
             throw new NullPointerException();
         }
-        if (this.categories == null) {
-            this.categories = new HashSet<>();
-        }
         this.categories.add(category);
         category.getProducts().add(this);
+        this.categoryNames.add(category.getName());
     }
 
     public void removeCategory(Category category) {
         if (category == null) {
             throw new NullPointerException();
         }
-        if (categories != null) {
-            categories.remove(category);
-        }
+        categories.remove(category);
         category.getProducts().remove(this);
+        this.categoryNames.remove(category.getName());
     }
 
     public void updateCategory(Category oldCategory, Category newCategory) {
         if (oldCategory == null || newCategory == null) {
             throw new NullPointerException();
         }
-        if (categories != null && categories.contains(oldCategory)) {
+        if (categories.contains(oldCategory)) {
             categories.remove(oldCategory);
             categories.add(newCategory);
+            this.categoryNames.remove(oldCategory.getName());
+            this.categoryNames.add(newCategory.getName());
         }
+
     }
 
     public static class ProductBuilder {

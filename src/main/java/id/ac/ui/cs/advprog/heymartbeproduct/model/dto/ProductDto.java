@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.Dto;
+package id.ac.ui.cs.advprog.heymartbeproduct.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
