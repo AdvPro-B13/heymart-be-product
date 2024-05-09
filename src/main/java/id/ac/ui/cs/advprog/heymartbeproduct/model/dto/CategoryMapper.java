@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.Dto;
+package id.ac.ui.cs.advprog.heymartbeproduct.model.dto;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
@@ -23,15 +23,17 @@ public class CategoryMapper {
 
     public CategoryDto convertToDto(Category category) {
         CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(category.getId());
         categoryDto.setName(category.getName());
         categoryDto.setProductIds(category.getProducts().stream()
-                .map(product -> product.getId())
+                .map(Product::getId)
                 .collect(Collectors.toSet()));
         return categoryDto;
     }
 
     public Category convertToEntity(CategoryDto categoryDto) {
         Category category = new Category.CategoryBuilder(categoryDto.getName()).build();
+        category.setId(categoryDto.getId());
         Set<Product> products = categoryDto.getProductIds().stream()
                 .map(productRepository::findProductById)
                 .filter(Optional::isPresent)

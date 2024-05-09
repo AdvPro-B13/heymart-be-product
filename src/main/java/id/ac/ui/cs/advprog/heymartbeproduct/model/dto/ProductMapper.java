@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.Dto;
+package id.ac.ui.cs.advprog.heymartbeproduct.model.dto;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
@@ -30,7 +30,7 @@ public class ProductMapper {
         productDto.setQuantity(product.getQuantity());
         productDto.setImage(product.getImage());
         productDto.setCategoryNames(product.getCategories().stream()
-                .map(category -> category.getName())
+                .map(Category::getName)
                 .collect(Collectors.toSet()));
         return productDto;
     }
