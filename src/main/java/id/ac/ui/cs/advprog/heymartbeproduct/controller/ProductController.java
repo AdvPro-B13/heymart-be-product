@@ -36,8 +36,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public CompletableFuture<ResponseEntity<ProductDto>> edit(@PathVariable String id,
             @RequestBody ProductDto productDto) {
-        productDto.setId(id);
-        return productService.edit(productDto)
+        return productService.edit(id, productDto)
                 .thenApply(product -> new ResponseEntity<>(product, HttpStatus.OK));
     }
 

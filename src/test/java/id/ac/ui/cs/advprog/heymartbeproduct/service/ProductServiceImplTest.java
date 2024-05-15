@@ -82,16 +82,28 @@ class ProductServiceImplTest {
     void testEditProduct() throws Exception {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         ProductDto productDto = new ProductDto();
-        when(productMapper.convertToEntity(productDto)).thenReturn(product);
+        productDto.setId(product.getId());
+        productDto.setName("Edited Product");
+        productDto.setPrice(200.0);
+        productDto.setQuantity(20);
+
+        Product editedProduct = new Product.ProductBuilder(productDto.getName(), productDto.getPrice(),
+                productDto.getQuantity()).build();
+        editedProduct.setId(productDto.getId());
+
+        when(productMapper.convertToEntity(productDto)).thenReturn(editedProduct);
         when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
-        when(productRepository.saveProduct(product)).thenReturn(product);
-        when(productMapper.convertToDto(product)).thenReturn(productDto);
+        when(productRepository.saveProduct(editedProduct)).thenReturn(editedProduct);
+        when(productMapper.convertToDto(editedProduct)).thenReturn(productDto);
 
         CompletableFuture<ProductDto> future = productService.edit(productDto);
         ProductDto editedProductDto = future.get();
 
         assertEquals(productDto, editedProductDto);
-        verify(productRepository, times(1)).saveProduct(product);
+        assertEquals(productDto.getName(), editedProductDto.getName());
+        assertEquals(productDto.getPrice(), editedProductDto.getPrice());
+        assertEquals(productDto.getQuantity(), editedProductDto.getQuantity());
+        verify(productRepository, times(1)).saveProduct(editedProduct);
     }
 
     @Test

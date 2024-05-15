@@ -118,10 +118,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void addProductToCategory(String categoryName, ProductDto productDto) {
-        if (productDto == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-        Product product = productMapper.convertToEntity(productDto);
+        Product product = productRepository.findByName(productDto.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         Category category = categoryRepository.findCategoryByName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("Category isn't found"));
         category.getProducts().add(product);
@@ -130,10 +128,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void removeProductFromCategory(String categoryName, ProductDto productDto) {
-        if (productDto == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-        Product product = productRepository.findProductById(productDto.getId())
+        Product product = productRepository.findByName(productDto.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         Category category = categoryRepository.findCategoryByName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("Category isn't found"));

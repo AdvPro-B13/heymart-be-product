@@ -23,7 +23,6 @@ public class ProductMapper {
 
     public ProductDto convertToDto(Product product) {
         ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
         productDto.setName(product.getName());
         productDto.setPrice(product.getPrice());
         productDto.setDescription(product.getDescription());
@@ -37,7 +36,6 @@ public class ProductMapper {
 
     public Product convertToEntity(ProductDto productDto) {
         Product product = new Product();
-        product.setId(productDto.getId());
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
         product.setDescription(productDto.getDescription());

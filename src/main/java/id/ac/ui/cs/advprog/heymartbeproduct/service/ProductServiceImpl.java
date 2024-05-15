@@ -43,9 +43,7 @@ public class ProductServiceImpl implements ProductService {
             if (product == null) {
                 throw new IllegalArgumentException("Product cannot be null");
             }
-            if (productRepository.findProductById(product.getId()).isPresent()) {
-                throw new IllegalArgumentException("Product with this ID already exists");
-            }
+
             return productMapper.convertToDto(productRepository.saveProduct(product));
         }, taskExecutor);
     }
@@ -67,18 +65,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Async("taskExecutor")
-    public CompletableFuture<ProductDto> edit(ProductDto productDto) {
+    public CompletableFuture<ProductDto> edit(String id, ProductDto productDto) {
         return CompletableFuture.supplyAsync(() -> {
-            logger.info("Editing product with ID: {}", productDto.getId());
-            Product product = productMapper.convertToEntity(productDto);
-            if (product == null) {
-                throw new IllegalArgumentException("Product cannot be null");
-            }
-            if (!productRepository.findProductById(product.getId()).isPresent()) {
-                throw new IllegalArgumentException("Product not found");
-            }
-            logger.info("Edited product with ID: {}", productDto.getId());
-            return productMapper.convertToDto(productRepository.saveProduct(product));
+            logger.info("Editing product with ID: {}", id);
+            Product existingProduct = productRepository.findProductById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            Product productToUpdate = productMapper.convertToEntity(productDto);
+            productToUpdate.setId(existingProduct.getId());
+            logger.info("Edited product with ID: {}", id);
+            return productMapper.convertToDto(productRepository.saveProduct(productToUpdate));
         }, taskExecutor);
     }
 

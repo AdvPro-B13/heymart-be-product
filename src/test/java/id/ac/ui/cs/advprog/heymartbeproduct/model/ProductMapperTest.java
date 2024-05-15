@@ -68,7 +68,6 @@ class ProductMapperTest {
 
         Product product = productMapper.convertToEntity(productDto);
 
-        assertEquals(productDto.getId(), product.getId());
         assertEquals(productDto.getName(), product.getName());
         assertEquals(productDto.getPrice(), product.getPrice());
         assertEquals(productDto.getDescription(), product.getDescription());

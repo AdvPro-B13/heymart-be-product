@@ -13,7 +13,7 @@ public interface ProductService {
 
     CompletableFuture<ProductDto> findById(String id);
 
-    CompletableFuture<ProductDto> edit(ProductDto productDto);
+    CompletableFuture<ProductDto> edit(String id, ProductDto productDto);
 
     CompletableFuture<Void> deleteById(String id);
 
