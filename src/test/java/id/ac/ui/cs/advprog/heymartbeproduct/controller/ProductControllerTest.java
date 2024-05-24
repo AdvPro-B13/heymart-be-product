@@ -6,7 +6,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
+
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductRequestDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductResponseDto;
 import id.ac.ui.cs.advprog.heymartbeproduct.service.ProductService;
 
 import java.util.Collections;
@@ -15,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class ProductControllerTest {
@@ -31,45 +35,45 @@ class ProductControllerTest {
 
     @Test
     void testCreateProduct() throws ExecutionException, InterruptedException {
-        ProductDto productDto = new ProductDto();
+        ProductResponseDto productDto = new ProductResponseDto();
         when(productService.create(any())).thenReturn(CompletableFuture.completedFuture(productDto));
 
-        ResponseEntity<ProductDto> responseEntity = productController.create(productDto).get();
+        ResponseEntity<ProductResponseDto> responseEntity = productController.create(new ProductRequestDto()).get();
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(productDto, responseEntity.getBody());
     }
 
     @Test
-    void testFindProductById() throws ExecutionException, InterruptedException {
-        String id = "1";
-        ProductDto productDto = new ProductDto();
-        when(productService.findById(id)).thenReturn(CompletableFuture.completedFuture(productDto));
-
-        ResponseEntity<ProductDto> responseEntity = productController.findById(id).get();
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(productDto, responseEntity.getBody());
-    }
-
-    @Test
     void testEditProduct() throws ExecutionException, InterruptedException {
         String id = "1";
-        ProductDto productDto = new ProductDto();
-        when(productService.edit(any())).thenReturn(CompletableFuture.completedFuture(productDto));
+        ProductResponseDto productDto = new ProductResponseDto();
+        when(productService.edit(anyString(), any())).thenReturn(CompletableFuture.completedFuture(productDto));
 
-        ResponseEntity<ProductDto> responseEntity = productController.edit(id, productDto).get();
+        ResponseEntity<ProductResponseDto> responseEntity = productController.edit(id, new ProductRequestDto()).get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(productDto, responseEntity.getBody());
     }
 
     @Test
-    void testDeleteProductById() throws ExecutionException, InterruptedException {
+    void testFindProductById() {
         String id = "1";
-        when(productService.deleteById(id)).thenReturn(CompletableFuture.completedFuture(null));
+        ProductResponseDto productDto = new ProductResponseDto();
+        when(productService.findById(id)).thenReturn(productDto);
 
-        ResponseEntity<String> responseEntity = productController.deleteById(id).get();
+        ResponseEntity<ProductResponseDto> responseEntity = productController.findById(id);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(productDto, responseEntity.getBody());
+    }
+
+    @Test
+    void testDeleteProductById() {
+        String id = "1";
+        doNothing().when(productService).deleteById(id);
+
+        ResponseEntity<String> responseEntity = productController.deleteById(id);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("DELETE SUCCESS", responseEntity.getBody());
@@ -77,10 +81,10 @@ class ProductControllerTest {
 
     @Test
     void testGetAllProducts() throws ExecutionException, InterruptedException {
-        List<ProductDto> productDtoList = Collections.emptyList();
+        List<ProductResponseDto> productDtoList = Collections.emptyList();
         when(productService.getAllProducts()).thenReturn(CompletableFuture.completedFuture(productDtoList));
 
-        ResponseEntity<List<ProductDto>> responseEntity = productController.getAllProducts().get();
+        ResponseEntity<List<ProductResponseDto>> responseEntity = productController.getAllProducts().get();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(productDtoList, responseEntity.getBody());

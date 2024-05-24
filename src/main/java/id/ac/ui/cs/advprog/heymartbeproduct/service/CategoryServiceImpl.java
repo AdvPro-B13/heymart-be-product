@@ -1,11 +1,10 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryMapper;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.CategoryRepository;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 
@@ -23,7 +22,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final ProductMapper productMapper;
 
     @Autowired
     public CategoryServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
@@ -32,7 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
-        this.productMapper = productMapper;
     }
 
     @Override
@@ -117,27 +114,26 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void addProductToCategory(String categoryName, ProductDto productDto) {
-        if (productDto == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-        Product product = productMapper.convertToEntity(productDto);
+    public void addProductToCategory(String categoryName, String productId) {
+        Product product = productRepository.findProductById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         Category category = categoryRepository.findCategoryByName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("Category isn't found"));
         category.getProducts().add(product);
+        product.getCategories().add(category);
         categoryRepository.saveCategory(category);
+        productRepository.saveProduct(product);
     }
 
     @Override
-    public void removeProductFromCategory(String categoryName, ProductDto productDto) {
-        if (productDto == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-        Product product = productRepository.findProductById(productDto.getId())
+    public void removeProductFromCategory(String categoryName, String productId) {
+        Product product = productRepository.findProductById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         Category category = categoryRepository.findCategoryByName(categoryName)
                 .orElseThrow(() -> new IllegalArgumentException("Category isn't found"));
         category.getProducts().remove(product);
+        product.getCategories().remove(category);
         categoryRepository.saveCategory(category);
+        productRepository.saveProduct(product);
     }
 }

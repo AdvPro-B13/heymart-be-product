@@ -1,8 +1,6 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.model;
+package id.ac.ui.cs.advprog.heymartbeproduct.dto;
 
 import org.junit.jupiter.api.Test;
-
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 

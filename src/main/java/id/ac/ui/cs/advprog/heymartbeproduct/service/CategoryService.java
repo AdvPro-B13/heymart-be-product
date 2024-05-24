@@ -2,8 +2,7 @@ package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
 import java.util.List;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryDto;
 
 public interface CategoryService {
     CategoryDto create(CategoryDto categoryDto);
@@ -18,7 +17,7 @@ public interface CategoryService {
 
     List<CategoryDto> getAllCategories();
 
-    void addProductToCategory(String name, ProductDto productDto);
+    void addProductToCategory(String categoryName, String productId);
 
-    void removeProductFromCategory(String name, ProductDto productDto);
+    void removeProductFromCategory(String categoryName, String productId);
 }
