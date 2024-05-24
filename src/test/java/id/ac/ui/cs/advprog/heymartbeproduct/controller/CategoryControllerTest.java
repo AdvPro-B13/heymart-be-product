@@ -6,7 +6,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
+
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryDto;
 import id.ac.ui.cs.advprog.heymartbeproduct.service.CategoryService;
 
 import java.util.Collections;

@@ -1,11 +1,11 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductResponseDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Category;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryMapper;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.CategoryRepository;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 
@@ -148,20 +148,24 @@ class CategoryServiceImplTest {
 
     @Test
     void testAddProductToCategory() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        // Arrange
+        String productName = "TV";
+        double productPrice = 100.0;
+        int productQuantity = 10;
+        String categoryName = "Electronics";
+        Product product = new Product.ProductBuilder(productName, productPrice, productQuantity).build();
         Category category = new Category();
-        category.setName("Electronics");
+        category.setName(categoryName);
 
-        when(productMapper.convertToEntity(productDto)).thenReturn(product);
-        when(categoryRepository.findCategoryByName("Electronics")).thenReturn(Optional.of(category));
+        when(productRepository.findProductById(anyString())).thenReturn(Optional.of(product));
+        when(categoryRepository.findCategoryByName(categoryName)).thenReturn(Optional.of(category));
 
-        categoryService.addProductToCategory("Electronics", productDto);
-        verify(productMapper, times(1)).convertToEntity(productDto);
-        verify(categoryRepository, times(1)).findCategoryByName("Electronics");
+        // Act
+        categoryService.addProductToCategory(categoryName, product.getId());
+
+        // Assert
+        verify(productRepository, times(1)).findProductById(product.getId());
+        verify(categoryRepository, times(1)).findCategoryByName(categoryName);
         assertTrue(category.getProducts().contains(product));
     }
 
@@ -220,42 +224,30 @@ class CategoryServiceImplTest {
 
     @Test
     void testAddProductToCategoryWithNullCategoryName() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
-        assertThrows(IllegalArgumentException.class, () -> categoryService.addProductToCategory(null, productDto));
+        String productId = "1";
+        assertThrows(IllegalArgumentException.class, () -> categoryService.addProductToCategory(null, productId));
     }
 
     @Test
     void testAddProductToCategoryWithNonExistingCategory() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
+        String productId = "1";
         when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> categoryService.addProductToCategory("Electronics", productDto));
+                () -> categoryService.addProductToCategory("Electronics", productId));
     }
 
     @Test
     void testRemoveProductFromCategoryWithNullCategoryName() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
-        assertThrows(IllegalArgumentException.class, () -> categoryService.removeProductFromCategory(null, productDto));
+        String productId = "1";
+        assertThrows(IllegalArgumentException.class, () -> categoryService.removeProductFromCategory(null, productId));
     }
 
     @Test
     void testRemoveProductFromCategoryWithNonExistingCategory() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
+        String productId = "1";
         when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> categoryService.removeProductFromCategory("Electronics", productDto));
+                () -> categoryService.removeProductFromCategory("Electronics", productId));
     }
 
     @Test
@@ -280,24 +272,23 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void testRemoveProductFromCategory() {
-        ProductDto productDto = new ProductDto();
-        productDto.setName("TV");
-        productDto.setPrice(100.0);
-        productDto.setQuantity(10);
+    public void testRemoveProductFromCategory() {
+        // Arrange
+        Product product = new Product();
+        Category category = new Category();
+        category.getProducts().add(product);
+        product.getCategories().add(category);
+        when(productRepository.findProductById(anyString())).thenReturn(Optional.of(product));
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
 
-        Product product = new Product.ProductBuilder("TV", 100.0, 10).build();
+        // Act
+        categoryService.removeProductFromCategory("categoryName", "productId");
 
-        Category category = new Category.CategoryBuilder("Electronics").build();
-        category.addProduct(product);
-
-        when(productRepository.findProductById(productDto.getId())).thenReturn(Optional.of(product));
-        when(categoryRepository.findCategoryByName("Electronics")).thenReturn(Optional.of(category));
-
-        categoryService.removeProductFromCategory("Electronics", productDto);
-
+        // Assert
         assertFalse(category.getProducts().contains(product));
-        verify(categoryRepository, times(1)).saveCategory(category);
+        assertFalse(product.getCategories().contains(category));
+        verify(categoryRepository).saveCategory(category);
+        verify(productRepository).saveProduct(product);
     }
 
     @Test
@@ -308,7 +299,8 @@ class CategoryServiceImplTest {
 
     @Test
     void testRemoveProductFromCategoryWithNonExistingProduct() {
-        ProductDto productDto = new ProductDto();
+        ProductResponseDto productDto = new ProductResponseDto();
+        productDto.setId("1");
         productDto.setName("TV");
         productDto.setPrice(100.0);
         productDto.setQuantity(10);
@@ -316,7 +308,7 @@ class CategoryServiceImplTest {
         when(productRepository.findProductById(productDto.getId())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> categoryService.removeProductFromCategory("Electronics", productDto));
+                () -> categoryService.removeProductFromCategory("Electronics", productDto.getId()));
     }
 
     @Test
@@ -327,14 +319,14 @@ class CategoryServiceImplTest {
 
     @Test
     void testRemoveProductFromCategoryWithNonExistingCategory2() {
-        ProductDto productDto = new ProductDto();
+        ProductResponseDto productDto = new ProductResponseDto();
         productDto.setId("zczc");
 
         when(productRepository.findProductById(productDto.getId())).thenReturn(Optional.of(new Product()));
         when(categoryRepository.findCategoryByName("NonExistingCategory")).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> categoryService.removeProductFromCategory("NonExistingCategory", productDto));
+                () -> categoryService.removeProductFromCategory("NonExistingCategory", productDto.getId()));
     }
 
     @Test

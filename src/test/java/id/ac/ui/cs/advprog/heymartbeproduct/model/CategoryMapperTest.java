@@ -1,7 +1,7 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.model;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.CategoryMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.CategoryMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
