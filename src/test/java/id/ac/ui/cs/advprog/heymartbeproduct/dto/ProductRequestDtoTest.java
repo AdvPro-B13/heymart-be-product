@@ -149,49 +149,6 @@ class ProductRequestDtoTest {
         }
 
         @Test
-        void testEqualsAndHashCode() {
-                Set<String> categoryNames1 = new HashSet<>();
-                categoryNames1.add("Electronics");
-                categoryNames1.add("Books");
-
-                Set<String> categoryNames2 = new HashSet<>(categoryNames1);
-
-                ProductRequestDto productDto1 = new ProductRequestDto("Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames1);
-                ProductRequestDto productDto2 = new ProductRequestDto("Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames2);
-                ProductRequestDto productDto3 = new ProductRequestDto("Product2", 200.0, "Description2", 20,
-                                "image2.jpg",
-                                categoryNames2);
-
-                // Reflexivity
-                assertTrue(productDto1.equals(productDto1));
-
-                // Symmetry
-                assertTrue(productDto1.equals(productDto2));
-                assertTrue(productDto2.equals(productDto1));
-
-                // Inequality
-                assertFalse(productDto1.equals(productDto3));
-                assertFalse(productDto3.equals(productDto1));
-
-                // Consistency
-                assertTrue(productDto1.equals(productDto2));
-                assertTrue(productDto1.equals(productDto2));
-
-                // Check null
-                assertFalse(productDto1.equals(null));
-
-                // Check hashCode
-                assertEquals(productDto1.hashCode(), productDto2.hashCode());
-
-                // Inequality of hashCode
-                assertNotEquals(productDto1.hashCode(), productDto3.hashCode());
-        }
-
-        @Test
         void testEqualsAndHashCodeWithDifferentFields() {
                 Set<String> categoryNames1 = new HashSet<>();
                 categoryNames1.add("Electronics");

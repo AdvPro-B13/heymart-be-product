@@ -245,4 +245,49 @@ class CategoryDtoTest {
         assertEquals("Electronics", categoryDto.getName());
         assertEquals(productIds, categoryDto.getProductIds());
     }
+
+    @Test
+    void testEqualsAndHashCodeWithNullProductIds() {
+        CategoryDto categoryDto1 = new CategoryDto(1L, "Electronics", null);
+        CategoryDto categoryDto2 = new CategoryDto(1L, "Electronics", null);
+        assertTrue(categoryDto1.equals(categoryDto2));
+        assertEquals(categoryDto1.hashCode(), categoryDto2.hashCode());
+    }
+
+    @Test
+    void testToStringWithNullFields() {
+        CategoryDto categoryDto = new CategoryDto(null, null, null);
+        String result = categoryDto.toString();
+        assertTrue(result.contains("id=null"));
+        assertTrue(result.contains("name=null"));
+        assertTrue(result.contains("productIds=null"));
+    }
+
+    @Test
+    void testSetProductIdsWithEmptySet() {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setProductIds(new HashSet<>());
+        assertTrue(categoryDto.getProductIds().isEmpty());
+    }
+
+    @Test
+    void testEqualsWithAllNullFields() {
+        CategoryDto categoryDto1 = new CategoryDto(null, null, null);
+        CategoryDto categoryDto2 = new CategoryDto(null, null, null);
+        assertTrue(categoryDto1.equals(categoryDto2));
+        assertEquals(categoryDto1.hashCode(), categoryDto2.hashCode());
+    }
+
+    @Test
+    void testEqualsWithOneNullField() {
+        Set<String> productIds = new HashSet<>(Arrays.asList("product1", "product2"));
+
+        CategoryDto categoryDto1 = new CategoryDto(1L, "Electronics", null);
+        CategoryDto categoryDto2 = new CategoryDto(1L, null, productIds);
+        CategoryDto categoryDto3 = new CategoryDto(null, "Electronics", productIds);
+
+        assertFalse(categoryDto1.equals(categoryDto2));
+        assertFalse(categoryDto2.equals(categoryDto3));
+        assertFalse(categoryDto3.equals(categoryDto1));
+    }
 }

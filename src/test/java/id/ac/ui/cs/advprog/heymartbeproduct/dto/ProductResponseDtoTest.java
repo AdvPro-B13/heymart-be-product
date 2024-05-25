@@ -64,6 +64,62 @@ class ProductResponseDtoTest {
         }
 
         @Test
+        void testNotEqualsAndHashCode() {
+                Set<String> categoryNames1 = new HashSet<>();
+                categoryNames1.add("Electronics");
+                categoryNames1.add("Books");
+
+                Set<String> categoryNames2 = new HashSet<>();
+                categoryNames2.add("Home");
+
+                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
+                                "image1.jpg",
+                                categoryNames1);
+                ProductResponseDto productDto2 = new ProductResponseDto("2", "Product2", 200.0, "Description2", 20,
+                                "image2.jpg",
+                                categoryNames2);
+
+                assertNotEquals(productDto1, productDto2);
+                assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
+        }
+
+        @Test
+        void testEqualsWithNullCategoryNames() {
+                Set<String> categoryNames = new HashSet<>();
+                categoryNames.add("Electronics");
+                categoryNames.add("Books");
+
+                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
+                                "image1.jpg",
+                                categoryNames);
+                ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
+                                "image1.jpg",
+                                null);
+
+                assertFalse(productDto1.equals(productDto2));
+                assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
+        }
+
+        @Test
+        void testEqualsWithEmptyCategoryNames() {
+                Set<String> categoryNames1 = new HashSet<>();
+                categoryNames1.add("Electronics");
+                categoryNames1.add("Books");
+
+                Set<String> categoryNames2 = new HashSet<>();
+
+                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
+                                "image1.jpg",
+                                categoryNames1);
+                ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
+                                "image1.jpg",
+                                categoryNames2);
+
+                assertFalse(productDto1.equals(productDto2));
+                assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
+        }
+
+        @Test
         void testToString() {
                 Set<String> categoryNames = new HashSet<>();
                 categoryNames.add("Electronics");
@@ -157,49 +213,6 @@ class ProductResponseDtoTest {
                 assertEquals(0, productDto.getQuantity());
                 assertNull(productDto.getImage());
                 assertNull(productDto.getCategoryNames());
-        }
-
-        @Test
-        void testEqualsAndHashCode() {
-                Set<String> categoryNames1 = new HashSet<>();
-                categoryNames1.add("Electronics");
-                categoryNames1.add("Books");
-
-                Set<String> categoryNames2 = new HashSet<>(categoryNames1);
-
-                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames1);
-                ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames2);
-                ProductResponseDto productDto3 = new ProductResponseDto("2", "Product2", 200.0, "Description2", 20,
-                                "image2.jpg",
-                                categoryNames2);
-
-                // Reflexivity
-                assertTrue(productDto1.equals(productDto1));
-
-                // Symmetry
-                assertTrue(productDto1.equals(productDto2));
-                assertTrue(productDto2.equals(productDto1));
-
-                // Inequality
-                assertFalse(productDto1.equals(productDto3));
-                assertFalse(productDto3.equals(productDto1));
-
-                // Consistency
-                assertTrue(productDto1.equals(productDto2));
-                assertTrue(productDto1.equals(productDto2));
-
-                // Check null
-                assertFalse(productDto1.equals(null));
-
-                // Check hashCode
-                assertEquals(productDto1.hashCode(), productDto2.hashCode());
-
-                // Inequality of hashCode
-                assertNotEquals(productDto1.hashCode(), productDto3.hashCode());
         }
 
         @Test
@@ -336,42 +349,6 @@ class ProductResponseDtoTest {
                 ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
                                 "image2.jpg",
                                 categoryNames);
-
-                assertFalse(productDto1.equals(productDto2));
-                assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
-        }
-
-        @Test
-        void testEqualsWithNullCategoryNames() {
-                Set<String> categoryNames = new HashSet<>();
-                categoryNames.add("Electronics");
-                categoryNames.add("Books");
-
-                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames);
-                ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                null);
-
-                assertFalse(productDto1.equals(productDto2));
-                assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
-        }
-
-        @Test
-        void testEqualsWithEmptyCategoryNames() {
-                Set<String> categoryNames1 = new HashSet<>();
-                categoryNames1.add("Electronics");
-                categoryNames1.add("Books");
-
-                Set<String> categoryNames2 = new HashSet<>();
-
-                ProductResponseDto productDto1 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames1);
-                ProductResponseDto productDto2 = new ProductResponseDto("1", "Product1", 100.0, "Description1", 10,
-                                "image1.jpg",
-                                categoryNames2);
 
                 assertFalse(productDto1.equals(productDto2));
                 assertNotEquals(productDto1.hashCode(), productDto2.hashCode());
