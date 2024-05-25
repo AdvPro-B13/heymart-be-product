@@ -1,7 +1,8 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.model;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductRequestDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductResponseDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class ProductMapperTest {
         categories.add(new Category.CategoryBuilder("Category 1").build());
         product.setCategories(categories);
 
-        ProductDto productDto = productMapper.convertToDto(product);
+        ProductResponseDto productDto = productMapper.convertToDto(product);
 
         assertEquals(product.getId(), productDto.getId());
         assertEquals(product.getName(), productDto.getName());
@@ -52,27 +53,26 @@ class ProductMapperTest {
 
     @Test
     void testConvertToEntity() {
-        ProductDto productDto = new ProductDto();
-        productDto.setId("1");
-        productDto.setName("Product 1");
-        productDto.setPrice(100.0);
-        productDto.setDescription("Description 1");
-        productDto.setQuantity(10);
-        productDto.setImage("Image 1");
+        ProductRequestDto productRequestDto = new ProductRequestDto();
+        productRequestDto.setName("Product 1");
+        productRequestDto.setPrice(100.0);
+        productRequestDto.setDescription("Description 1");
+        productRequestDto.setQuantity(10);
+        productRequestDto.setImage("Image 1");
         Set<String> categoryNames = new HashSet<>();
         categoryNames.add("Category 1");
-        productDto.setCategoryNames(categoryNames);
+        productRequestDto.setCategoryNames(categoryNames);
 
         Category category = new Category.CategoryBuilder("Category 1").build();
         when(categoryRepository.findCategoryByName("Category 1")).thenReturn(Optional.of(category));
 
-        Product product = productMapper.convertToEntity(productDto);
+        Product product = productMapper.convertToEntity(productRequestDto);
 
-        assertEquals(productDto.getName(), product.getName());
-        assertEquals(productDto.getPrice(), product.getPrice());
-        assertEquals(productDto.getDescription(), product.getDescription());
-        assertEquals(productDto.getQuantity(), product.getQuantity());
-        assertEquals(productDto.getImage(), product.getImage());
-        assertEquals(productDto.getCategoryNames().size(), product.getCategories().size());
+        assertEquals(productRequestDto.getName(), product.getName());
+        assertEquals(productRequestDto.getPrice(), product.getPrice());
+        assertEquals(productRequestDto.getDescription(), product.getDescription());
+        assertEquals(productRequestDto.getQuantity(), product.getQuantity());
+        assertEquals(productRequestDto.getImage(), product.getImage());
+        assertEquals(productRequestDto.getCategoryNames().size(), product.getCategories().size());
     }
 }

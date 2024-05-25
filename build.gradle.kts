@@ -35,9 +35,10 @@ dependencies {
 	implementation("jakarta.transaction:jakarta.transaction-api:2.0.1")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.12.5")
 	compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -80,7 +81,12 @@ tasks.test{
 
 tasks.jacocoTestReport {
     classDirectories.setFrom(files(classDirectories.files.map {
-        fileTree(it) { exclude("**/*Application**") }
+        fileTree(it) { exclude(
+                "**/*Application**",
+                "**/dto/*",
+                "**/enums/*",
+                "**/config/*",
+        ) }
     }))
     dependsOn(tasks.test) // tests are required to run before generating the report
     reports {

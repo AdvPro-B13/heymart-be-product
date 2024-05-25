@@ -1,8 +1,9 @@
 package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductResponseDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductMapper;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductRequestDto;
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductMapper;
 import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +18,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class ProductServiceImplTest {
@@ -51,99 +55,133 @@ class ProductServiceImplTest {
     @Test
     void testCreateProduct() throws Exception {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
-        ProductDto productDto = new ProductDto();
-        when(productMapper.convertToEntity(productDto)).thenReturn(product);
+        ProductRequestDto productRequestDto = new ProductRequestDto();
+        when(productMapper.convertToEntity(productRequestDto)).thenReturn(product);
         when(productRepository.saveProduct(product)).thenReturn(product);
+        ProductResponseDto productDto = productMapper.convertToDto(product);
         when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        CompletableFuture<ProductDto> future = productService.create(productDto);
-        ProductDto savedProductDto = future.get();
+        CompletableFuture<ProductResponseDto> future = productService.create(productRequestDto);
+        ProductResponseDto savedProductDto = future.get();
 
         assertEquals(productDto, savedProductDto);
-        verify(productRepository, times(1)).findProductById(product.getId());
+        verify(productRepository, times(1)).saveProduct(product);
     }
 
     @Test
-    void testFindProductById() throws Exception {
+    void testEditProduct() throws Exception {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
-        ProductDto productDto = new ProductDto();
+        ProductRequestDto productRequestDto = new ProductRequestDto();
+        when(productMapper.convertToEntity(productRequestDto)).thenReturn(product);
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
+        when(productRepository.saveProduct(product)).thenReturn(product);
+        ProductResponseDto productDto = productMapper.convertToDto(product);
+        when(productMapper.convertToDto(product)).thenReturn(productDto);
+
+        CompletableFuture<ProductResponseDto> future = productService.edit(product.getId(), productRequestDto);
+        ProductResponseDto editedProductDto = future.get();
+
+        assertEquals(productDto, editedProductDto);
+        verify(productRepository, times(1)).saveProduct(product);
+    }
+
+    @Test
+    void testFindProductById() {
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductResponseDto productDto = new ProductResponseDto();
         String productId = product.getId();
         when(productRepository.findProductById(productId)).thenReturn(Optional.of(product));
         when(productMapper.convertToDto(product)).thenReturn(productDto);
 
-        CompletableFuture<ProductDto> future = productService.findById(productId);
-        ProductDto foundProductDto = future.get();
+        ProductResponseDto foundProductDto = productService.findById(productId);
 
         assertEquals(productDto, foundProductDto);
         verify(productRepository, times(1)).findProductById(productId);
     }
 
     @Test
-    void testEditProduct() throws Exception {
-        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setName("Edited Product");
-        productDto.setPrice(200.0);
-        productDto.setQuantity(20);
+    void testFindProductByIdNonexistent() {
+        String productId = "nonexistent";
+        when(productRepository.findProductById(productId)).thenReturn(Optional.empty());
 
-        Product editedProduct = new Product.ProductBuilder(productDto.getName(), productDto.getPrice(),
-                productDto.getQuantity()).build();
-        editedProduct.setId(productDto.getId());
-
-        when(productMapper.convertToEntity(productDto)).thenReturn(editedProduct);
-        when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
-        when(productRepository.saveProduct(editedProduct)).thenReturn(editedProduct);
-        when(productMapper.convertToDto(editedProduct)).thenReturn(productDto);
-
-        CompletableFuture<ProductDto> future = productService.edit(productDto);
-        ProductDto editedProductDto = future.get();
-
-        assertEquals(productDto, editedProductDto);
-        assertEquals(productDto.getName(), editedProductDto.getName());
-        assertEquals(productDto.getPrice(), editedProductDto.getPrice());
-        assertEquals(productDto.getQuantity(), editedProductDto.getQuantity());
-        verify(productRepository, times(1)).saveProduct(editedProduct);
+        assertThrows(IllegalArgumentException.class, () -> productService.findById(productId));
+        verify(productRepository, times(1)).findProductById(productId);
     }
 
     @Test
-    void testDeleteProductById() throws Exception {
+    void testDeleteProductById() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        when(productMapper.convertToEntity(productDto)).thenReturn(product);
-        when(productRepository.saveProduct(product)).thenReturn(product);
-        when(productMapper.convertToDto(product)).thenReturn(productDto);
+        when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(product));
+        doNothing().when(productRepository).deleteProductById(product.getId());
 
-        CompletableFuture<ProductDto> future = productService.create(productDto);
-        ProductDto savedProductDto = future.get();
-        String productId = savedProductDto.getId();
+        productService.deleteById(product.getId());
+        verify(productRepository, times(1)).deleteProductById(product.getId());
+    }
 
-        assertNotNull(productId, "Product ID should not be null");
-        when(productRepository.findProductById(productId)).thenReturn(Optional.of(product));
-        doNothing().when(productRepository).deleteProductById(productId);
+    @Test
+    void testDeleteProductByIdNotFound() {
+        String productId = "nonexistent";
+        when(productRepository.findProductById(productId)).thenReturn(Optional.empty());
 
-        CompletableFuture<Void> deleteFuture = productService.deleteById(productId);
-        deleteFuture.get();
-        verify(productRepository, times(1)).deleteProductById(productId);
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteById(productId));
+        verify(productRepository, times(1)).findProductById(productId);
+    }
+
+    @Test
+    void testDeleteProductByIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteById(null));
+        verify(productRepository, never()).findProductById(anyString());
+    }
+
+    @Test
+    void testDeleteProductByIdEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteById(""));
+        verify(productRepository, never()).findProductById(anyString());
     }
 
     @Test
     void testGetAllProducts() throws Exception {
         Product product1 = new Product.ProductBuilder("Product 1", 5.0, 2).build();
         Product product2 = new Product.ProductBuilder("Product 2", 1.99, 3).build();
-        ProductDto productDto1 = new ProductDto();
-        ProductDto productDto2 = new ProductDto();
+        ProductResponseDto productDto1 = new ProductResponseDto();
+        ProductResponseDto productDto2 = new ProductResponseDto();
         List<Product> products = Arrays.asList(product1, product2);
-        List<ProductDto> productDtos = Arrays.asList(productDto1, productDto2);
+        List<ProductResponseDto> productDtos = Arrays.asList(productDto1, productDto2);
         when(productRepository.getAllProducts()).thenReturn(products);
         when(productMapper.convertToDto(product1)).thenReturn(productDto1);
         when(productMapper.convertToDto(product2)).thenReturn(productDto2);
 
-        CompletableFuture<List<ProductDto>> future = productService.getAllProducts();
-        List<ProductDto> returnedProductDtos = future.get();
+        CompletableFuture<List<ProductResponseDto>> future = productService.getAllProducts();
+        List<ProductResponseDto> returnedProductDtos = future.get();
 
         assertEquals(productDtos, returnedProductDtos);
         verify(productRepository, times(1)).getAllProducts();
+    }
+
+    @Test
+    void testEditProductWithNullProductRequestDto() {
+        ProductRequestDto productRequestDto = null;
+        String productId = "1";
+
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> productService.edit(productId, productRequestDto).get());
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        verify(productRepository, never()).findProductById(anyString());
+        verify(productRepository, never()).saveProduct(any(Product.class));
+    }
+
+    @Test
+    void testEditProductWithNonexistentId() throws Exception {
+        Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
+        ProductRequestDto productRequestDto = new ProductRequestDto();
+        when(productMapper.convertToEntity(productRequestDto)).thenReturn(product);
+        String productId = "nonexistent";
+        when(productRepository.findProductById(productId)).thenReturn(Optional.empty());
+
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> productService.edit(productId, productRequestDto).get());
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        verify(productRepository, times(1)).findProductById(productId);
+        verify(productRepository, never()).saveProduct(any(Product.class));
     }
 }

@@ -1,15 +1,20 @@
-package id.ac.ui.cs.advprog.heymartbeproduct.model.dto;
+package id.ac.ui.cs.advprog.heymartbeproduct.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductResponseDto {
+    private String id;
     private String name;
     private double price;
     private String description;

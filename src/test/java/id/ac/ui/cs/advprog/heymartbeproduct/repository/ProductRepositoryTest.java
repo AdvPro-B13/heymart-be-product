@@ -28,9 +28,15 @@ class ProductRepositoryTest {
     @InjectMocks
     private ProductRepository productRepository;
 
+    Product product;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+
+        product = new Product();
+        product.setId("prod-123");
+        product.setName("Laptop");
     }
 
     @Test
@@ -152,13 +158,14 @@ class ProductRepositoryTest {
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
-        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product.setId("prod-123");
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(null);
 
         Product result = productRepository.saveProduct(product);
 
         verify(entityManager, times(1)).persist(product);
+        verify(entityManager, times(0)).merge(product);
         assertEquals(product, result);
     }
 
@@ -183,12 +190,14 @@ class ProductRepositoryTest {
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
+        product.setId(null);
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(null);
 
         Product result = productRepository.saveProduct(product);
 
         verify(entityManager, times(1)).persist(product);
+        verify(entityManager, times(0)).merge(product);
         assertEquals(product, result);
     }
 
@@ -207,7 +216,7 @@ class ProductRepositoryTest {
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
                 .build();
-        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product.setId("prod-123");
 
         when(entityManager.find(Product.class, product.getId())).thenReturn(product);
         when(entityManager.merge(product)).thenReturn(product);
@@ -216,6 +225,23 @@ class ProductRepositoryTest {
 
         verify(entityManager, times(0)).persist(product);
         verify(entityManager, times(1)).merge(product);
+        assertEquals(product, result);
+    }
+
+    @Test
+    void testSaveProductWhenProductIdIsNotNullAndProductDoesNotExist() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .build();
+        product.setId("prod-123");
+
+        when(entityManager.find(Product.class, product.getId())).thenReturn(null);
+
+        Product result = productRepository.saveProduct(product);
+
+        verify(entityManager, times(1)).persist(product);
+        verify(entityManager, times(0)).merge(product);
         assertEquals(product, result);
     }
 }

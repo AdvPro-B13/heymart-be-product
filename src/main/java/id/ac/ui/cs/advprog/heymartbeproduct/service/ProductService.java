@@ -2,20 +2,21 @@ package id.ac.ui.cs.advprog.heymartbeproduct.service;
 
 import org.springframework.stereotype.Service;
 
-import id.ac.ui.cs.advprog.heymartbeproduct.model.dto.ProductDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductRequestDto;
+import id.ac.ui.cs.advprog.heymartbeproduct.dto.ProductResponseDto;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
 public interface ProductService {
-    CompletableFuture<ProductDto> create(ProductDto productDto);
+    CompletableFuture<ProductResponseDto> create(ProductRequestDto productDto);
 
-    CompletableFuture<ProductDto> findById(String id);
+    ProductResponseDto findById(String id);
 
-    CompletableFuture<ProductDto> edit(String id, ProductDto productDto);
+    CompletableFuture<ProductResponseDto> edit(String id, ProductRequestDto productDto);
 
-    CompletableFuture<Void> deleteById(String id);
+    void deleteById(String id);
 
-    CompletableFuture<List<ProductDto>> getAllProducts();
+    CompletableFuture<List<ProductResponseDto>> getAllProducts();
 }
