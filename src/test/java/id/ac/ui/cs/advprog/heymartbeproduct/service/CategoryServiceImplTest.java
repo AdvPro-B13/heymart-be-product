@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class CategoryServiceImplTest {
 
@@ -52,6 +55,10 @@ class CategoryServiceImplTest {
     Category category;
     CategoryDto categoryDto;
 
+    Product product1;
+    Product product2;
+    Product product3;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
@@ -59,8 +66,15 @@ class CategoryServiceImplTest {
         categoryDto = new CategoryDto();
         categoryDto.setName("Electronics");
 
-        Product product1 = new Product.ProductBuilder("TV", 100.0, 10).build();
-        Product product2 = new Product.ProductBuilder("Radio", 50.0, 5).build();
+        product1 = new Product.ProductBuilder("TV", 100.0, 10).build();
+        product1.setId("1");
+
+        product2 = new Product.ProductBuilder("Radio", 50.0, 5).build();
+        product2.setId("2");
+
+        product3 = new Product.ProductBuilder("Computer", 200.0, 20).build();
+        product3.setId("3");
+
         category.addProduct(product1);
         category.addProduct(product2);
     }
@@ -411,5 +425,106 @@ class CategoryServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> {
             categoryService.edit(categoryId, newCategoryDto);
         });
+    }
+
+    @Test
+    public void testAddProductToCategory_CategoryNotFound() {
+        when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
+        when(categoryRepository.findCategoryByName("Electronics")).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.addProductToCategory("Electronics", "1");
+        });
+
+        assertEquals("Category isn't found", exception.getMessage());
+        verify(categoryRepository, never()).saveCategory(any(Category.class));
+        verify(productRepository, never()).saveProduct(any(Product.class));
+    }
+
+    @Test
+    public void testEditCategory_NoChange() {
+        categoryDto.setProductIds(Stream.of("1", "2").collect(Collectors.toSet()));
+
+        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
+        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
+        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
+
+        CategoryDto result = categoryService.edit(1L, categoryDto);
+
+        assertNotNull(result);
+        assertEquals("Electronics", result.getName());
+        assertTrue(result.getProductIds().contains("1"));
+        assertTrue(result.getProductIds().contains("2"));
+
+        verify(productRepository, never()).saveProduct(product1);
+        verify(productRepository, never()).saveProduct(product2);
+        verify(categoryRepository).saveCategory(any(Category.class));
+    }
+
+    @Test
+    public void testEditCategory_AddProducts() {
+        categoryDto.setProductIds(Stream.of("1", "2", "3").collect(Collectors.toSet()));
+
+        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
+        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
+        when(productRepository.findProductById("3")).thenReturn(Optional.of(product3));
+        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
+
+        CategoryDto result = categoryService.edit(1L, categoryDto);
+
+        assertNotNull(result);
+        assertEquals("Electronics", result.getName());
+        assertTrue(result.getProductIds().contains("1"));
+        assertTrue(result.getProductIds().contains("2"));
+        assertTrue(result.getProductIds().contains("3"));
+
+        verify(productRepository, never()).saveProduct(product1);
+        verify(productRepository, never()).saveProduct(product2);
+        verify(productRepository).saveProduct(product3);
+        verify(categoryRepository).saveCategory(any(Category.class));
+    }
+
+    @Test
+    public void testEditCategory_RemoveProducts() {
+        categoryDto.setProductIds(Stream.of("2").collect(Collectors.toSet()));
+
+        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
+        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
+
+        CategoryDto result = categoryService.edit(1L, categoryDto);
+
+        assertNotNull(result);
+        assertEquals("Electronics", result.getName());
+        assertTrue(result.getProductIds().contains("2"));
+        assertFalse(result.getProductIds().contains("1"));
+
+        verify(productRepository).saveProduct(product1);
+        verify(productRepository, never()).saveProduct(product2);
+        verify(categoryRepository).saveCategory(any(Category.class));
+    }
+
+    @Test
+    public void testEditCategory_AddAndRemoveProducts() {
+        categoryDto.setProductIds(Stream.of("2", "3").collect(Collectors.toSet()));
+
+        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
+        when(productRepository.findProductById("3")).thenReturn(Optional.of(product3));
+        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
+
+        CategoryDto result = categoryService.edit(1L, categoryDto);
+
+        assertNotNull(result);
+        assertEquals("Electronics", result.getName());
+        assertTrue(result.getProductIds().contains("2"));
+        assertTrue(result.getProductIds().contains("3"));
+        assertFalse(result.getProductIds().contains("1"));
+
+        verify(productRepository).saveProduct(product1);
+        verify(productRepository).saveProduct(product3);
+        verify(categoryRepository).saveCategory(any(Category.class));
     }
 }
