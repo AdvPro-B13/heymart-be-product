@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,39 +65,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto edit(Long id, CategoryDto categoryDto) {
-        Category category = categoryRepository.findCategoryById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-
-        category.setName(categoryDto.getName());
-
-        Set<Product> newProducts = categoryDto.getProductIds().stream()
-                .map(productId -> productRepository.findProductById(productId)
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found")))
-                .collect(Collectors.toSet());
-
-        Set<Product> oldProducts = new HashSet<>(category.getProducts());
-        category.setProducts(newProducts);
-
-        oldProducts.stream()
-                .filter(product -> !newProducts.contains(product))
-                .forEach(product -> {
-                    product.getCategories().remove(category);
-                    productRepository.saveProduct(product);
-                });
-
-        newProducts.stream()
-                .filter(product -> !oldProducts.contains(product))
-                .forEach(product -> {
-                    product.getCategories().add(category);
-                    productRepository.saveProduct(product);
-                });
-
-        categoryRepository.saveCategory(category);
-        return categoryMapper.convertToDto(category);
-    }
-
-    @Override
     public void deleteById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Id cannot be null");
@@ -110,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAllCategories() {
         return categoryRepository.getAllCategories().stream()
                 .map(categoryMapper::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,10 +29,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class CategoryServiceImplTest {
 
@@ -101,42 +97,6 @@ class CategoryServiceImplTest {
 
         assertEquals("Electronics", result.getName());
         verify(categoryRepository, times(1)).findCategoryByName("Electronics");
-    }
-
-    @Test
-    void testEditName() {
-        Long oldId = 1L;
-        String newName = "NewCategory";
-
-        CategoryDto newCategoryDto = new CategoryDto();
-        newCategoryDto.setName(newName);
-        newCategoryDto.setProductIds(new HashSet<>(Arrays.asList("newProduct")));
-
-        Category oldCategory = new Category();
-        oldCategory.setId(oldId);
-        oldCategory.setName("OldCategory");
-
-        Product oldProduct = new Product();
-        oldProduct.setId("oldProduct");
-        oldCategory.getProducts().add(oldProduct);
-
-        Product newProduct = new Product();
-        newProduct.setId("newProduct");
-
-        when(categoryRepository.findCategoryById(oldId)).thenReturn(Optional.of(oldCategory));
-        when(productRepository.findProductById(oldProduct.getId())).thenReturn(Optional.of(oldProduct));
-        when(productRepository.findProductById(newProduct.getId())).thenReturn(Optional.of(newProduct));
-        when(categoryRepository.saveCategory(any(Category.class))).thenReturn(oldCategory);
-        when(productRepository.saveProduct(any(Product.class))).thenReturn(newProduct);
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(newCategoryDto);
-
-        CategoryDto result = categoryService.edit(oldId, newCategoryDto);
-
-        assertEquals(newName, result.getName());
-        assertTrue(result.getProductIds().contains(newProduct.getId()));
-        assertFalse(result.getProductIds().contains(oldProduct.getId()));
-        verify(categoryRepository, times(1)).saveCategory(any(Category.class));
-        verify(productRepository, times(2)).saveProduct(any(Product.class));
     }
 
     @Test
@@ -220,17 +180,6 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void testEditWithNullId() {
-        assertThrows(IllegalArgumentException.class, () -> categoryService.edit(null, categoryDto));
-    }
-
-    @Test
-    void testEditWithNonExistingCategory() {
-        when(categoryRepository.findCategoryById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> categoryService.edit(1L, categoryDto));
-    }
-
-    @Test
     void testDeleteByIdWithNullId() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> categoryService.deleteById(null));
         assertEquals("Id cannot be null", exception.getMessage());
@@ -286,7 +235,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    public void testRemoveProductFromCategory() {
+    void testRemoveProductFromCategory() {
         // Arrange
         Product product = new Product();
         Category category = new Category();
@@ -344,91 +293,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void testEditProductRemovedFromCategory() {
-        Long categoryId = 1L;
-        CategoryDto newCategoryDto = new CategoryDto();
-        newCategoryDto.setName("NewCategory");
-        newCategoryDto.setProductIds(new HashSet<>(Arrays.asList("newProduct")));
-
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("OldCategory");
-
-        Product oldProduct = new Product();
-        oldProduct.setId("oldProduct");
-        oldProduct.getCategories().add(category);
-        category.getProducts().add(oldProduct);
-
-        Product newProduct = new Product();
-        newProduct.setId("newProduct");
-
-        CategoryDto returnedCategoryDto = new CategoryDto();
-        returnedCategoryDto.setName("NewCategory");
-        returnedCategoryDto.setProductIds(new HashSet<>(Arrays.asList("newProduct")));
-
-        when(categoryRepository.findCategoryById(categoryId)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById(oldProduct.getId())).thenReturn(Optional.of(oldProduct));
-        when(productRepository.findProductById("newProduct")).thenReturn(Optional.of(newProduct));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(returnedCategoryDto);
-
-        CategoryDto result = categoryService.edit(categoryId, newCategoryDto);
-
-        assertNotNull(result);
-        assertFalse(result.getProductIds().contains(oldProduct.getId()));
-        verify(productRepository, times(1)).saveProduct(oldProduct);
-        verify(productRepository, times(1)).saveProduct(newProduct);
-    }
-
-    @Test
-    void testEditProductAddedToCategory() {
-        Long categoryId = 1L;
-        CategoryDto newCategoryDto = new CategoryDto();
-        newCategoryDto.setName("NewCategory");
-        newCategoryDto.setProductIds(new HashSet<>(Arrays.asList("newProduct")));
-
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("OldCategory");
-
-        Product newProduct = new Product();
-        newProduct.setId("newProduct");
-
-        CategoryDto returnedCategoryDto = new CategoryDto();
-        returnedCategoryDto.setName("NewCategory");
-        returnedCategoryDto.setProductIds(new HashSet<>(Arrays.asList("newProduct")));
-
-        when(categoryRepository.findCategoryById(categoryId)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("newProduct")).thenReturn(Optional.of(newProduct));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(returnedCategoryDto);
-
-        CategoryDto result = categoryService.edit(categoryId, newCategoryDto);
-
-        assertNotNull(result);
-        assertTrue(result.getProductIds().contains(newProduct.getId()));
-        verify(productRepository, times(1)).saveProduct(newProduct);
-    }
-
-    @Test
-    void testEditProductNotFound() {
-        Long categoryId = 1L;
-        CategoryDto newCategoryDto = new CategoryDto();
-        newCategoryDto.setName("NewCategory");
-        newCategoryDto.setProductIds(new HashSet<>(Arrays.asList("nonExistentProduct")));
-
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("OldCategory");
-
-        when(categoryRepository.findCategoryById(categoryId)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("nonExistentProduct")).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            categoryService.edit(categoryId, newCategoryDto);
-        });
-    }
-
-    @Test
-    public void testAddProductToCategory_CategoryNotFound() {
+    void testAddProductToCategory_CategoryNotFound() {
         when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
         when(categoryRepository.findCategoryByName("Electronics")).thenReturn(Optional.empty());
 
@@ -439,92 +304,5 @@ class CategoryServiceImplTest {
         assertEquals("Category isn't found", exception.getMessage());
         verify(categoryRepository, never()).saveCategory(any(Category.class));
         verify(productRepository, never()).saveProduct(any(Product.class));
-    }
-
-    @Test
-    public void testEditCategory_NoChange() {
-        categoryDto.setProductIds(Stream.of("1", "2").collect(Collectors.toSet()));
-
-        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
-        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.edit(1L, categoryDto);
-
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
-        assertTrue(result.getProductIds().contains("1"));
-        assertTrue(result.getProductIds().contains("2"));
-
-        verify(productRepository, never()).saveProduct(product1);
-        verify(productRepository, never()).saveProduct(product2);
-        verify(categoryRepository).saveCategory(any(Category.class));
-    }
-
-    @Test
-    public void testEditCategory_AddProducts() {
-        categoryDto.setProductIds(Stream.of("1", "2", "3").collect(Collectors.toSet()));
-
-        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("1")).thenReturn(Optional.of(product1));
-        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
-        when(productRepository.findProductById("3")).thenReturn(Optional.of(product3));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.edit(1L, categoryDto);
-
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
-        assertTrue(result.getProductIds().contains("1"));
-        assertTrue(result.getProductIds().contains("2"));
-        assertTrue(result.getProductIds().contains("3"));
-
-        verify(productRepository, never()).saveProduct(product1);
-        verify(productRepository, never()).saveProduct(product2);
-        verify(productRepository).saveProduct(product3);
-        verify(categoryRepository).saveCategory(any(Category.class));
-    }
-
-    @Test
-    public void testEditCategory_RemoveProducts() {
-        categoryDto.setProductIds(Stream.of("2").collect(Collectors.toSet()));
-
-        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.edit(1L, categoryDto);
-
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
-        assertTrue(result.getProductIds().contains("2"));
-        assertFalse(result.getProductIds().contains("1"));
-
-        verify(productRepository).saveProduct(product1);
-        verify(productRepository, never()).saveProduct(product2);
-        verify(categoryRepository).saveCategory(any(Category.class));
-    }
-
-    @Test
-    public void testEditCategory_AddAndRemoveProducts() {
-        categoryDto.setProductIds(Stream.of("2", "3").collect(Collectors.toSet()));
-
-        when(categoryRepository.findCategoryById(1L)).thenReturn(Optional.of(category));
-        when(productRepository.findProductById("2")).thenReturn(Optional.of(product2));
-        when(productRepository.findProductById("3")).thenReturn(Optional.of(product3));
-        when(categoryMapper.convertToDto(any(Category.class))).thenReturn(categoryDto);
-
-        CategoryDto result = categoryService.edit(1L, categoryDto);
-
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
-        assertTrue(result.getProductIds().contains("2"));
-        assertTrue(result.getProductIds().contains("3"));
-        assertFalse(result.getProductIds().contains("1"));
-
-        verify(productRepository).saveProduct(product1);
-        verify(productRepository).saveProduct(product3);
-        verify(categoryRepository).saveCategory(any(Category.class));
     }
 }

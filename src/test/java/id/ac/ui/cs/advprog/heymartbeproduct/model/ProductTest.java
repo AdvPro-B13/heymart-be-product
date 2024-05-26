@@ -108,30 +108,30 @@ class ProductTest {
 
     @Test
     void testUpdateCategory() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category oldCategory = new Category();
         oldCategory.setName("OldCategory");
         Category newCategory = new Category();
         newCategory.setName("NewCategory");
 
-        product.addCategory(oldCategory);
-        product.updateCategory(oldCategory, newCategory);
+        product1.addCategory(oldCategory);
+        product1.updateCategory(oldCategory, newCategory);
 
-        assertTrue(product.getCategories().contains(newCategory));
-        assertFalse(product.getCategories().contains(oldCategory));
-        assertTrue(product.getCategoryNames().contains(newCategory.getName()));
-        assertFalse(product.getCategoryNames().contains(oldCategory.getName()));
+        assertTrue(product1.getCategories().contains(newCategory));
+        assertFalse(product1.getCategories().contains(oldCategory));
+        assertTrue(product1.getCategoryNames().contains(newCategory.getName()));
+        assertFalse(product1.getCategoryNames().contains(oldCategory.getName()));
     }
 
     @Test
     void testAddCategory2() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category category = new Category();
         category.setName("NewCategory");
 
-        product.addCategory(category);
+        product1.addCategory(category);
 
-        assertTrue(product.getCategories().contains(category));
+        assertTrue(product1.getCategories().contains(category));
     }
 
     @Test
@@ -149,27 +149,27 @@ class ProductTest {
 
     @Test
     void testSetQuantity() {
-        Product product = new Product();
+        Product product1 = new Product();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            product.setQuantity(-1);
+            product1.setQuantity(-1);
         });
 
-        product.setQuantity(10);
+        product1.setQuantity(10);
 
-        assertEquals(10, product.getQuantity());
+        assertEquals(10, product1.getQuantity());
     }
 
     @Test
     void testRemoveCategory2() {
-        Product product = new Product();
-        Category category = new Category();
-        category.setName("NewCategory");
+        Product product1 = new Product();
+        Category category1 = new Category();
+        category1.setName("NewCategory");
 
-        product.addCategory(category);
-        product.removeCategory(category);
+        product1.addCategory(category1);
+        product1.removeCategory(category1);
 
-        assertFalse(product.getCategories().contains(category));
+        assertFalse(product1.getCategories().contains(category1));
     }
 
     @Test
@@ -196,45 +196,45 @@ class ProductTest {
 
     @Test
     void testAddCategoryNull() {
-        Product product = new Product();
+        Product product1 = new Product();
 
         assertThrows(NullPointerException.class, () -> {
-            product.addCategory(null);
+            product1.addCategory(null);
         });
     }
 
     @Test
     void testRemoveCategoryNull() {
-        Product product = new Product();
+        Product product1 = new Product();
 
         assertThrows(NullPointerException.class, () -> {
-            product.removeCategory(null);
+            product1.removeCategory(null);
         });
     }
 
     @Test
     void testUpdateCategoryNull() {
-        Product product = new Product();
+        Product product1 = new Product();
 
         assertThrows(NullPointerException.class, () -> {
-            product.updateCategory(null, null);
+            product1.updateCategory(null, null);
         });
     }
 
     @Test
     void testUpdateCategoryWhenCategoriesIsNull() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category oldCategory = new Category();
         oldCategory.setName("OldCategory");
         Category newCategory = new Category();
         newCategory.setName("NewCategory");
 
-        assertDoesNotThrow(() -> product.updateCategory(oldCategory, newCategory));
+        assertDoesNotThrow(() -> product1.updateCategory(oldCategory, newCategory));
     }
 
     @Test
     void testUpdateCategoryWhenOldCategoryNotPresent() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category oldCategory = new Category();
         oldCategory.setName("OldCategory");
         Category newCategory = new Category();
@@ -242,50 +242,50 @@ class ProductTest {
 
         Category differentCategory = new Category();
         differentCategory.setName("DifferentCategory");
-        product.addCategory(differentCategory);
+        product1.addCategory(differentCategory);
 
-        assertDoesNotThrow(() -> product.updateCategory(oldCategory, newCategory));
+        assertDoesNotThrow(() -> product1.updateCategory(oldCategory, newCategory));
     }
 
     @Test
     void testUpdateCategoryWhenOldCategoryIsNull() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category newCategory = new Category();
         newCategory.setName("NewCategory");
 
-        assertThrows(NullPointerException.class, () -> product.updateCategory(null, newCategory));
+        assertThrows(NullPointerException.class, () -> product1.updateCategory(null, newCategory));
     }
 
     @Test
     void testUpdateCategoryWhenNewCategoryIsNull() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category oldCategory = new Category();
         oldCategory.setName("OldCategory");
 
-        assertThrows(NullPointerException.class, () -> product.updateCategory(oldCategory, null));
+        assertThrows(NullPointerException.class, () -> product1.updateCategory(oldCategory, null));
     }
 
     @Test
     void testUpdateCategoryNotContained() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category oldCategory = new Category();
         oldCategory.setName("OldCategory");
         Category newCategory = new Category();
         newCategory.setName("NewCategory");
 
-        product.updateCategory(oldCategory, newCategory);
+        product1.updateCategory(oldCategory, newCategory);
 
         assertFalse(product.getCategories().contains(newCategory));
     }
 
     @Test
     void testGetCategoryNames() {
-        Product product = new Product();
+        Product product1 = new Product();
         Category category1 = new Category();
         category1.setName("Category1");
-        product.addCategory(category1);
+        product1.addCategory(category1);
 
-        Set<String> categoryNames = product.getCategoryNames();
+        Set<String> categoryNames = product1.getCategoryNames();
 
         assertTrue(categoryNames.contains("Category1"));
     }
