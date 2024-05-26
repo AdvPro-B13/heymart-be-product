@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+    private static final String PRODUCT_NOT_FOUND = "Product not found";
 
     private final Executor taskExecutor;
 
@@ -61,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDto findProductByIdAndSupermarketId(String id, Long supermarketId) {
         logger.info("Finding product with ID: {} in supermarket with ID: {}", id, supermarketId);
         Product product = productRepository.findProductByIdAndSupermarketId(id, supermarketId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new IllegalArgumentException(PRODUCT_NOT_FOUND));
         logger.info("Found product with ID: {} in supermarket with ID: {}", id, supermarketId);
         return productMapper.convertToDto(product);
     }
@@ -77,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return products.stream()
                 .map(productMapper::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
                 throw new IllegalArgumentException("Product cannot be null");
             }
             if (!productRepository.findProductById(id).isPresent()) {
-                throw new IllegalArgumentException("Product not found");
+                throw new IllegalArgumentException(PRODUCT_NOT_FOUND);
             }
             product.setId(id);
             logger.info("Edited product with ID: {}", id);
@@ -105,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }
         if (!productRepository.findProductById(id).isPresent()) {
-            throw new IllegalArgumentException("Product not found");
+            throw new IllegalArgumentException(PRODUCT_NOT_FOUND);
         }
         productRepository.deleteProductById(id);
         logger.info("Deleted product with ID: {}", id);

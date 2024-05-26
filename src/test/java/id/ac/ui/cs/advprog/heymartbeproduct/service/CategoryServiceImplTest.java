@@ -11,6 +11,7 @@ import id.ac.ui.cs.advprog.heymartbeproduct.repository.ProductRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -238,19 +239,19 @@ class CategoryServiceImplTest {
     void testRemoveProductFromCategory() {
         // Arrange
         Product product = new Product();
-        Category category = new Category();
-        category.getProducts().add(product);
-        product.getCategories().add(category);
+        Category category1 = new Category();
+        category1.getProducts().add(product);
+        product.getCategories().add(category1);
         when(productRepository.findProductById(anyString())).thenReturn(Optional.of(product));
-        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category));
+        when(categoryRepository.findCategoryByName(anyString())).thenReturn(Optional.of(category1));
 
         // Act
         categoryService.removeProductFromCategory("categoryName", "productId");
 
         // Assert
-        assertFalse(category.getProducts().contains(product));
+        assertFalse(category1.getProducts().contains(product));
         assertFalse(product.getCategories().contains(category));
-        verify(categoryRepository).saveCategory(category);
+        verify(categoryRepository).saveCategory(category1);
         verify(productRepository).saveProduct(product);
     }
 
@@ -270,8 +271,9 @@ class CategoryServiceImplTest {
 
         when(productRepository.findProductById(productDto.getId())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> categoryService.removeProductFromCategory("Electronics", productDto.getId()));
+        Executable executable = () -> categoryService.removeProductFromCategory("Electronics", productDto.getId());
+
+        assertThrows(IllegalArgumentException.class, executable);
     }
 
     @Test
@@ -282,14 +284,14 @@ class CategoryServiceImplTest {
 
     @Test
     void testRemoveProductFromCategoryWithNonExistingCategory2() {
-        ProductResponseDto productDto = new ProductResponseDto();
-        productDto.setId("zczc");
+        String productId = "zczc";
+        String categoryName = "NonExistingCategory";
 
-        when(productRepository.findProductById(productDto.getId())).thenReturn(Optional.of(new Product()));
-        when(categoryRepository.findCategoryByName("NonExistingCategory")).thenReturn(Optional.empty());
+        when(productRepository.findProductById(productId)).thenReturn(Optional.of(new Product()));
+        when(categoryRepository.findCategoryByName(categoryName)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> categoryService.removeProductFromCategory("NonExistingCategory", productDto.getId()));
+                () -> categoryService.removeProductFromCategory(categoryName, productId));
     }
 
     @Test

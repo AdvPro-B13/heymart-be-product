@@ -54,7 +54,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void testFindProductByIdAndSupermarketId_ProductFound() {
+    void testFindProductByIdAndSupermarketId_ProductFound() {
         String id = "product123";
         Long supermarketId = 1L;
         Product product = new Product();
@@ -70,7 +70,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void testFindProductByIdAndSupermarketId_ProductNotFound() {
+    void testFindProductByIdAndSupermarketId_ProductNotFound() {
         String id = "product123";
         Long supermarketId = 1L;
 
@@ -82,7 +82,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void testFindProductsBySupermarketId_ProductsFound() {
+    void testFindProductsBySupermarketId_ProductsFound() {
         Long supermarketId = 1L;
         Product product = new Product();
         ProductResponseDto productResponseDto = new ProductResponseDto();
@@ -100,7 +100,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void testFindProductsBySupermarketId_NoProductsFound() {
+    void testFindProductsBySupermarketId_NoProductsFound() {
         Long supermarketId = 1L;
 
         when(productRepository.findProductsBySupermarketId(supermarketId)).thenReturn(Collections.emptyList());
@@ -230,7 +230,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void testEditProductWithNonexistentId() throws Exception {
+    void testEditProductWithNonexistentId() {
         Product product = new Product.ProductBuilder("Product 1", 100.0, 10).build();
         ProductRequestDto productRequestDto = new ProductRequestDto();
         when(productMapper.convertToEntity(productRequestDto)).thenReturn(product);
