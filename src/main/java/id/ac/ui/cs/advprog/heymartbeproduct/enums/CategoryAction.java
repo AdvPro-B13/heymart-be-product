@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum CategoryAction {
-    CREATE("category:create"),
-    READ("category:read"),
-    DELETE("category:delete");
+    CREATE("categories:create"),
+    READ("categories:read"),
+    DELETE("categories:delete");
 
     private final String value;
 

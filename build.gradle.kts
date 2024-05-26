@@ -27,20 +27,28 @@ val seleniumJavaVersion = "4.14.1"
 val seleniumJupiterVersion = "5.0.1"
 val webdrivermanagerVersion = "5.6.3"
 val junitJupiterVersion = "5.9.1"
+val jakartaPersistenceApiVersion = "3.1.0"
+val jakartaTransactionApiVersion = "2.0.1"
+val micrometerRegistryPrometheusVersion = "1.12.5"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
-	implementation("jakarta.transaction:jakarta.transaction-api:2.0.1")
+    implementation("jakarta.persistence:jakarta.persistence-api:$jakartaPersistenceApiVersion")
+    implementation("jakarta.transaction:jakarta.transaction-api:$jakartaTransactionApiVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.12.5")
+
 	compileOnly("org.projectlombok:lombok")
+
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus:$micrometerRegistryPrometheusVersion")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
 	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")

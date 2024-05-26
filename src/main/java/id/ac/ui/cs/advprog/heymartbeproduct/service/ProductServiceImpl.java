@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -95,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
             logger.info("Getting all products");
             List<ProductResponseDto> products = productRepository.getAllProducts().stream()
                     .map(productMapper::convertToDto)
-                    .collect(Collectors.toList());
+                    .toList();
             logger.info("Found {} products", products.size());
             return products;
         }, taskExecutor);
