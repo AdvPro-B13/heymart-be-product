@@ -14,6 +14,10 @@ public interface ProductService {
 
     ProductResponseDto findById(String id);
 
+    ProductResponseDto findProductByIdAndSupermarketId(String id, Long supermarketId);
+
+    List<ProductResponseDto> findProductsBySupermarketId(Long supermarketId);
+
     CompletableFuture<ProductResponseDto> edit(String id, ProductRequestDto productDto);
 
     void deleteById(String id);

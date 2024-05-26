@@ -29,6 +29,7 @@ public class ProductMapper {
         productResponseDto.setDescription(product.getDescription());
         productResponseDto.setQuantity(product.getQuantity());
         productResponseDto.setImage(product.getImage());
+        productResponseDto.setSupermarketId(product.getSupermarketId());
         productResponseDto.setCategoryNames(product.getCategories().stream()
                 .map(Category::getName)
                 .collect(Collectors.toSet()));
@@ -42,6 +43,7 @@ public class ProductMapper {
         product.setDescription(productRequestDto.getDescription());
         product.setQuantity(productRequestDto.getQuantity());
         product.setImage(productRequestDto.getImage());
+        product.setSupermarketId(productRequestDto.getSupermarketId());
         Set<Category> categories = productRequestDto.getCategoryNames().stream()
                 .map(categoryRepository::findCategoryByName)
                 .filter(Optional::isPresent)

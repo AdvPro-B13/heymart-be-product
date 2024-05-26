@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProductRequestDto {
     private String name;
+    private Long supermarketId;
     private double price;
     private String description;
     private int quantity;

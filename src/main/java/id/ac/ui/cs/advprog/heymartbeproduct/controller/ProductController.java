@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/product")
 public class ProductController {
 
@@ -38,34 +40,65 @@ public class ProductController {
                 .thenApply(product -> new ResponseEntity<>(product, HttpStatus.CREATED));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{productId}")
     public ResponseEntity<Object> findById(
-            @PathVariable String id,
+            @PathVariable String productId,
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         if (!authServiceClient.verifyUserAuthorization(ProductAction.READ.getValue(), authorizationHeader)) {
             return new ResponseEntity<>(ErrorResponse.UNAUTHORIZED.getValue(), HttpStatus.UNAUTHORIZED);
         }
         try {
-            ProductResponseDto product = productService.findById(id);
+            ProductResponseDto product = productService.findById(productId);
             return new ResponseEntity<>(product, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(ErrorResponse.NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("edit/{id}")
+    @GetMapping("supermarket/{supermarketId}")
+    public ResponseEntity<Object> findProductsBySupermarketId(
+            @PathVariable Long supermarketId,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        if (!authServiceClient.verifyUserAuthorization(ProductAction.READ.getValue(), authorizationHeader)) {
+            return new ResponseEntity<>(ErrorResponse.UNAUTHORIZED.getValue(), HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            List<ProductResponseDto> products = productService.findProductsBySupermarketId(supermarketId);
+            return new ResponseEntity<>(products, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(ErrorResponse.NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("supermarket/{supermarketId}/{productId}")
+    public ResponseEntity<Object> findProductByIdAndSupermarketId(
+            @PathVariable Long supermarketId,
+            @PathVariable String productId,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        if (!authServiceClient.verifyUserAuthorization(ProductAction.READ.getValue(), authorizationHeader)) {
+            return new ResponseEntity<>(ErrorResponse.UNAUTHORIZED.getValue(), HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            ProductResponseDto product = productService.findProductByIdAndSupermarketId(productId, supermarketId);
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(ErrorResponse.NOT_FOUND.getValue(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("edit/{productId}")
     public CompletableFuture<ResponseEntity<Object>> edit(
-            @PathVariable String id,
+            @PathVariable String productId,
             @RequestBody ProductRequestDto productRequestDto,
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         if (!authServiceClient.verifyUserAuthorization(ProductAction.EDIT.getValue(), authorizationHeader)) {
             return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.UNAUTHORIZED.getValue()));
         }
-        return productService.edit(id, productRequestDto)
+        return productService.edit(productId, productRequestDto)
                 .thenApply(productResponseDto -> {
 
-                    Object responseBody = (Object) productResponseDto;
+                    Object responseBody = productResponseDto;
                     return new ResponseEntity<>(responseBody, HttpStatus.OK);
                 })
                 .exceptionally(

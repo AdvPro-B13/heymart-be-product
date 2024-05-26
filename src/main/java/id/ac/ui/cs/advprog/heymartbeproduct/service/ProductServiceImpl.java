@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -54,6 +55,29 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product isn't found"));
         logger.info("Found product with ID: {}", id);
         return productMapper.convertToDto(product);
+    }
+
+    @Override
+    public ProductResponseDto findProductByIdAndSupermarketId(String id, Long supermarketId) {
+        logger.info("Finding product with ID: {} in supermarket with ID: {}", id, supermarketId);
+        Product product = productRepository.findProductByIdAndSupermarketId(id, supermarketId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        logger.info("Found product with ID: {} in supermarket with ID: {}", id, supermarketId);
+        return productMapper.convertToDto(product);
+    }
+
+    @Override
+    public List<ProductResponseDto> findProductsBySupermarketId(Long supermarketId) {
+        logger.info("Finding products for supermarket with ID: {}", supermarketId);
+        List<Product> products = productRepository.findProductsBySupermarketId(supermarketId);
+        if (products.isEmpty()) {
+            logger.info("No products found for supermarket with ID: {}", supermarketId);
+        } else {
+            logger.info("Found {} products for supermarket with ID: {}", products.size(), supermarketId);
+        }
+        return products.stream()
+                .map(productMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override

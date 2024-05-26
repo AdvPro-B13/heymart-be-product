@@ -29,6 +29,9 @@ public class Product {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
+    @Column(name = "supermarket_id")
+    private Long supermarketId;
+
     @Column(name = "image")
     private String image;
 
@@ -50,6 +53,7 @@ public class Product {
         this.description = builder.description;
         this.quantity = builder.quantity;
         this.image = builder.image;
+        this.supermarketId = builder.supermarketId;
         this.categories = builder.categories != null ? new HashSet<>(builder.categories) : new HashSet<>();
     }
 
@@ -107,6 +111,7 @@ public class Product {
         // Optional parameters
         private String description;
         private String image;
+        private Long supermarketId;
         private Set<Category> categories;
         private Set<String> categoryNames;
 
@@ -132,6 +137,11 @@ public class Product {
 
         public ProductBuilder setImage(String image) {
             this.image = image;
+            return this;
+        }
+
+        public ProductBuilder setSupermarketId(Long supermarketId) {
+            this.supermarketId = supermarketId;
             return this;
         }
 

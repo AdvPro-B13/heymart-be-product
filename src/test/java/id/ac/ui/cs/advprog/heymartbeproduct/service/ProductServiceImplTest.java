@@ -15,6 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -50,6 +51,64 @@ class ProductServiceImplTest {
 
         // Set the taskExecutor in productService
         ReflectionTestUtils.setField(productService, "taskExecutor", taskExecutor);
+    }
+
+    @Test
+    public void testFindProductByIdAndSupermarketId_ProductFound() {
+        String id = "product123";
+        Long supermarketId = 1L;
+        Product product = new Product();
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+
+        when(productRepository.findProductByIdAndSupermarketId(id, supermarketId)).thenReturn(Optional.of(product));
+        when(productMapper.convertToDto(product)).thenReturn(productResponseDto);
+
+        ProductResponseDto result = productService.findProductByIdAndSupermarketId(id, supermarketId);
+
+        assertNotNull(result);
+        assertEquals(productResponseDto, result);
+    }
+
+    @Test
+    public void testFindProductByIdAndSupermarketId_ProductNotFound() {
+        String id = "product123";
+        Long supermarketId = 1L;
+
+        when(productRepository.findProductByIdAndSupermarketId(id, supermarketId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            productService.findProductByIdAndSupermarketId(id, supermarketId);
+        });
+    }
+
+    @Test
+    public void testFindProductsBySupermarketId_ProductsFound() {
+        Long supermarketId = 1L;
+        Product product = new Product();
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        List<Product> products = Collections.singletonList(product);
+
+        when(productRepository.findProductsBySupermarketId(supermarketId)).thenReturn(products);
+        when(productMapper.convertToDto(product)).thenReturn(productResponseDto);
+
+        List<ProductResponseDto> result = productService.findProductsBySupermarketId(supermarketId);
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(productResponseDto, result.get(0));
+    }
+
+    @Test
+    public void testFindProductsBySupermarketId_NoProductsFound() {
+        Long supermarketId = 1L;
+
+        when(productRepository.findProductsBySupermarketId(supermarketId)).thenReturn(Collections.emptyList());
+
+        List<ProductResponseDto> result = productService.findProductsBySupermarketId(supermarketId);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test

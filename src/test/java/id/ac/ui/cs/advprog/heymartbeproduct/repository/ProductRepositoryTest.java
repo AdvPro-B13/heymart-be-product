@@ -2,10 +2,13 @@ package id.ac.ui.cs.advprog.heymartbeproduct.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import id.ac.ui.cs.advprog.heymartbeproduct.model.Product;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,18 +28,72 @@ class ProductRepositoryTest {
     @Mock
     private EntityManager entityManager;
 
+    @Mock
+    private TypedQuery<Product> typedQuery;
+
     @InjectMocks
     private ProductRepository productRepository;
 
-    Product product;
+    private Product product;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
         product = new Product();
-        product.setId("prod-123");
-        product.setName("Laptop");
+        product.setId("1");
+        product.setSupermarketId(1L);
+    }
+
+    @Test
+    void testFindProductByIdAndSupermarketId_ProductExists() {
+        when(entityManager.createQuery(anyString(), eq(Product.class))).thenReturn(typedQuery);
+        when(typedQuery.setParameter("id", "1")).thenReturn(typedQuery);
+        when(typedQuery.setParameter("supermarketId", 1L)).thenReturn(typedQuery);
+        when(typedQuery.getSingleResult()).thenReturn(product);
+
+        Optional<Product> result = productRepository.findProductByIdAndSupermarketId("1", 1L);
+
+        assertTrue(result.isPresent());
+        assertEquals(product, result.get());
+
+        verify(entityManager).createQuery(anyString(), eq(Product.class));
+        verify(typedQuery).setParameter("id", "1");
+        verify(typedQuery).setParameter("supermarketId", 1L);
+        verify(typedQuery).getSingleResult();
+    }
+
+    @Test
+    void testFindProductByIdAndSupermarketId_ProductDoesNotExist() {
+        when(entityManager.createQuery(anyString(), eq(Product.class))).thenReturn(typedQuery);
+        when(typedQuery.setParameter("id", "1")).thenReturn(typedQuery);
+        when(typedQuery.setParameter("supermarketId", 1L)).thenReturn(typedQuery);
+        when(typedQuery.getSingleResult()).thenThrow(new NoResultException());
+
+        Optional<Product> result = productRepository.findProductByIdAndSupermarketId("1", 1L);
+
+        assertTrue(result.isEmpty());
+
+        verify(entityManager).createQuery(anyString(), eq(Product.class));
+        verify(typedQuery).setParameter("id", "1");
+        verify(typedQuery).setParameter("supermarketId", 1L);
+        verify(typedQuery).getSingleResult();
+    }
+
+    @Test
+    void testFindProductsBySupermarketId() {
+        when(entityManager.createQuery(anyString(), eq(Product.class))).thenReturn(typedQuery);
+        when(typedQuery.setParameter("supermarketId", 1L)).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(Collections.singletonList(product));
+
+        List<Product> result = productRepository.findProductsBySupermarketId(1L);
+
+        assertEquals(1, result.size());
+        assertEquals(product, result.get(0));
+
+        verify(entityManager).createQuery(anyString(), eq(Product.class));
+        verify(typedQuery).setParameter("supermarketId", 1L);
+        verify(typedQuery).getResultList();
     }
 
     @Test
