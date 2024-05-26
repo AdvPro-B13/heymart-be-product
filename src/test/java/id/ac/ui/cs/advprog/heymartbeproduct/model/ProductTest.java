@@ -133,25 +133,25 @@ class ProductTest {
     @Test
     void testAddCategory2() {
         Product product1 = new Product();
-        Category category = new Category();
-        category.setName("NewCategory");
+        Category category1 = new Category();
+        category1.setName("NewCategory");
 
-        product1.addCategory(category);
+        product1.addCategory(category1);
 
-        assertTrue(product1.getCategories().contains(category));
+        assertTrue(product1.getCategories().contains(category1));
     }
 
     @Test
     void testSetPrice() {
-        Product product = new Product();
+        Product product1 = new Product();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            product.setPrice(-1);
+            product1.setPrice(-1);
         });
 
-        product.setPrice(100);
+        product1.setPrice(100);
 
-        assertEquals(100, product.getPrice());
+        assertEquals(100, product1.getPrice());
     }
 
     @Test
@@ -196,9 +196,9 @@ class ProductTest {
         Product.ProductBuilder productBuilder = new Product.ProductBuilder();
         productBuilder.setCategories(categories);
 
-        Product product = productBuilder.build();
+        Product product1 = productBuilder.build();
 
-        assertTrue(product.getCategories().contains(category1));
+        assertTrue(product1.getCategories().contains(category1));
     }
 
     @Test

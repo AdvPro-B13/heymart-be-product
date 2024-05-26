@@ -57,9 +57,9 @@ class CategoryTest {
     void testCategoryBuilderSetName() {
         Category.CategoryBuilder builder = new Category.CategoryBuilder("");
         builder.setName("testName");
-        Category category = builder.build();
+        Category category1 = builder.build();
 
-        assertEquals("testName", category.getName());
+        assertEquals("testName", category1.getName());
     }
 
     @Test

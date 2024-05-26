@@ -38,19 +38,20 @@ class ProductRepositoryTest {
     @InjectMocks
     private ProductRepository productRepository;
 
-    private Product product;
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-
-        product = new Product();
-        product.setId("1");
-        product.setSupermarketId(1L);
     }
 
     @Test
     void testFindProductByIdAndSupermarketId_ProductExists() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
+                .build();
+        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
         when(entityManager.createQuery(anyString(), eq(Product.class))).thenReturn(typedQuery);
         when(typedQuery.setParameter("id", "1")).thenReturn(typedQuery);
         when(typedQuery.setParameter("supermarketId", 1L)).thenReturn(typedQuery);
@@ -86,6 +87,13 @@ class ProductRepositoryTest {
 
     @Test
     void testFindProductsBySupermarketId() {
+        Product product = new Product.ProductBuilder("Product1", 4.99, 10)
+                .setDescription("This is Product1")
+                .setImage("image.jpg")
+                .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
+                .build();
+        product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
         when(entityManager.createQuery(anyString(), eq(Product.class))).thenReturn(typedQuery);
         when(typedQuery.setParameter("supermarketId", 1L)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(Collections.singletonList(product));

@@ -129,11 +129,11 @@ class CategoryServiceImplTest {
         int productQuantity = 10;
         String categoryName = "Electronics";
         Product product = new Product.ProductBuilder(productName, productPrice, productQuantity).build();
-        Category category = new Category();
-        category.setName(categoryName);
+        Category category1 = new Category();
+        category1.setName(categoryName);
 
         when(productRepository.findProductById(anyString())).thenReturn(Optional.of(product));
-        when(categoryRepository.findCategoryByName(categoryName)).thenReturn(Optional.of(category));
+        when(categoryRepository.findCategoryByName(categoryName)).thenReturn(Optional.of(category1));
 
         // Act
         categoryService.addProductToCategory(categoryName, product.getId());
@@ -141,7 +141,7 @@ class CategoryServiceImplTest {
         // Assert
         verify(productRepository, times(1)).findProductById(product.getId());
         verify(categoryRepository, times(1)).findCategoryByName(categoryName);
-        assertTrue(category.getProducts().contains(product));
+        assertTrue(category1.getProducts().contains(product));
     }
 
     @Test

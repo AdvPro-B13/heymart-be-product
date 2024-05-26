@@ -246,57 +246,57 @@ class CategoryRepositoryTest {
         Product product1 = new Product.ProductBuilder("Product1", 100.0, 10).build();
         Product product2 = new Product.ProductBuilder("Product2", 200.0, 20).build();
         Set<Product> products = new HashSet<>(Arrays.asList(product1, product2));
-        Category category = new Category.CategoryBuilder(name).setProducts(products).build();
+        Category category1 = new Category.CategoryBuilder(name).setProducts(products).build();
 
         when(entityManager.createQuery(anyString(), eq(Category.class))).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
-        when(query.getResultList()).thenReturn(Arrays.asList(category));
+        when(query.getResultList()).thenReturn(Arrays.asList(category1));
 
         categoryRepository.deleteCategoryByName(name);
 
         verify(entityManager, times(1)).createQuery(anyString(), eq(Category.class));
         verify(query, times(1)).setParameter(anyString(), anyString());
         verify(entityManager, times(2)).merge(any(Product.class)); // Verify that merge is called for each product
-        verify(entityManager, times(1)).remove(category);
+        verify(entityManager, times(1)).remove(category1);
     }
 
     @Test
     void testDeleteCategoryByNameWhenCategoryHasNoProducts() {
         String name = "Electronics";
-        Category category = new Category.CategoryBuilder(name).build();
+        Category category1 = new Category.CategoryBuilder(name).build();
 
         when(entityManager.createQuery(anyString(), eq(Category.class))).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
-        when(query.getResultList()).thenReturn(Arrays.asList(category));
+        when(query.getResultList()).thenReturn(Arrays.asList(category1));
 
         categoryRepository.deleteCategoryByName(name);
 
         verify(entityManager, times(1)).createQuery(anyString(), eq(Category.class));
         verify(query, times(1)).setParameter(anyString(), anyString());
         verify(entityManager, times(0)).merge(any(Product.class)); // Verify that merge is not called
-        verify(entityManager, times(1)).remove(category);
+        verify(entityManager, times(1)).remove(category1);
     }
 
     @Test
     void testSaveCategoryWhenCategoryDoesNotExist() {
-        Category category = new Category.CategoryBuilder("Electronics").build();
+        Category category1 = new Category.CategoryBuilder("Electronics").build();
         when(entityManager.createQuery(anyString(), eq(Category.class))).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
         when(query.getResultList()).thenReturn(new ArrayList<>());
 
-        Category result = categoryRepository.saveCategory(category);
+        Category result = categoryRepository.saveCategory(category1);
 
-        verify(entityManager, times(1)).persist(category);
+        verify(entityManager, times(1)).persist(category1);
         assertEquals("Electronics", result.getName());
     }
 
     @Test
     void testSaveCategoryWhenCategoryNameIsNull() {
-        Category category = new Category.CategoryBuilder(null).build();
+        Category category1 = new Category.CategoryBuilder(null).build();
 
-        Category result = categoryRepository.saveCategory(category);
+        Category result = categoryRepository.saveCategory(category1);
 
-        verify(entityManager, times(1)).persist(category);
+        verify(entityManager, times(1)).persist(category1);
         assertNull(result.getName());
     }
 }
