@@ -191,4 +191,83 @@ class ProductControllerTest {
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
         assertEquals(ErrorResponse.UNAUTHORIZED.getValue(), responseEntity.getBody());
     }
+
+    @Test
+    void testFindProductsBySupermarketIdUnauthorized() {
+        Long supermarketId = 1L;
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(false);
+
+        ResponseEntity<Object> responseEntity = productController.findProductsBySupermarketId(supermarketId, "auth");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(ErrorResponse.UNAUTHORIZED.getValue(), responseEntity.getBody());
+    }
+
+    @Test
+    void testFindProductsBySupermarketIdNotFound() {
+        Long supermarketId = 1L;
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(true);
+        when(productService.findProductsBySupermarketId(supermarketId)).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> responseEntity = productController.findProductsBySupermarketId(supermarketId, "auth");
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals(ErrorResponse.NOT_FOUND.getValue(), responseEntity.getBody());
+    }
+
+    @Test
+    void testFindProductByIdAndSupermarketIdUnauthorized() {
+        Long supermarketId = 1L;
+        String productId = "1";
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(false);
+
+        ResponseEntity<Object> responseEntity = productController.findProductByIdAndSupermarketId(supermarketId,
+                productId, "auth");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(ErrorResponse.UNAUTHORIZED.getValue(), responseEntity.getBody());
+    }
+
+    @Test
+    void testFindProductByIdAndSupermarketIdNotFound() {
+        Long supermarketId = 1L;
+        String productId = "1";
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(true);
+        when(productService.findProductByIdAndSupermarketId(productId, supermarketId))
+                .thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> responseEntity = productController.findProductByIdAndSupermarketId(supermarketId,
+                productId, "auth");
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals(ErrorResponse.NOT_FOUND.getValue(), responseEntity.getBody());
+    }
+
+    @Test
+    void testFindProductsBySupermarketId() {
+        Long supermarketId = 1L;
+        List<ProductResponseDto> productDtoList = Collections.emptyList();
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(true);
+        when(productService.findProductsBySupermarketId(supermarketId)).thenReturn(productDtoList);
+
+        ResponseEntity<Object> responseEntity = productController.findProductsBySupermarketId(supermarketId, "auth");
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(productDtoList, responseEntity.getBody());
+    }
+
+    @Test
+    void testFindProductByIdAndSupermarketId() {
+        Long supermarketId = 1L;
+        String productId = "1";
+        ProductResponseDto productDto = new ProductResponseDto();
+        when(authServiceClient.verifyUserAuthorization(anyString(), anyString())).thenReturn(true);
+        when(productService.findProductByIdAndSupermarketId(productId, supermarketId)).thenReturn(productDto);
+
+        ResponseEntity<Object> responseEntity = productController.findProductByIdAndSupermarketId(supermarketId,
+                productId, "auth");
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(productDto, responseEntity.getBody());
+    }
 }

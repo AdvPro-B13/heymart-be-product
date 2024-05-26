@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProductResponseDto {
     private String id;
+    private Long supermarketId;
     private String name;
     private double price;
     private String description;

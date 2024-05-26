@@ -3,16 +3,11 @@ package id.ac.ui.cs.advprog.heymartbeproduct.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ProductTest {
     private Product product;
@@ -26,6 +21,7 @@ class ProductTest {
         this.product = new Product.ProductBuilder("Product1", 4.99, 10)
                 .setDescription("This is Product1")
                 .setImage("image.jpg")
+                .setSupermarketId(1L)
                 .setCategoryNames(new HashSet<>(Arrays.asList("Category1", "Category2")))
                 .build();
         this.product.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
@@ -59,6 +55,17 @@ class ProductTest {
     @Test
     void testImage() {
         assertEquals("image.jpg", product.getImage());
+    }
+
+    @Test
+    void testGetSupermarketId() {
+        assertEquals(1L, product.getSupermarketId());
+    }
+
+    @Test
+    void testSetSupermarketId() {
+        product.setSupermarketId(1L);
+        assertEquals(1, product.getSupermarketId());
     }
 
     @Test
@@ -275,7 +282,7 @@ class ProductTest {
 
         product1.updateCategory(oldCategory, newCategory);
 
-        assertFalse(product.getCategories().contains(newCategory));
+        assertFalse(product1.getCategories().contains(newCategory));
     }
 
     @Test
@@ -288,5 +295,15 @@ class ProductTest {
         Set<String> categoryNames = product1.getCategoryNames();
 
         assertTrue(categoryNames.contains("Category1"));
+    }
+
+    @Test
+    void testSetCategoryNames() {
+        Product product1 = new Product();
+        Set<String> categoryNames = new HashSet<>();
+        categoryNames.add("Category1");
+        product1.setCategoryNames(categoryNames);
+
+        assertEquals(categoryNames, product1.getCategoryNames());
     }
 }
